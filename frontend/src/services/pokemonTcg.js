@@ -12,10 +12,19 @@ export const getUsdToBrl = async () => {
   return parseFloat(response.data.USDBRL.bid)
 }
 
-export const searchCards = async (query, page = 1, pageSize = 20) => {
+export const searchCards = async ({ name, number, set, rarity, page = 1, pageSize = 20 }) => {
+  const filters = []
+
+  if (name) filters.push(`name:${name}*`)
+  if (number) filters.push(`number:${number}`)
+  if (set) filters.push(`set.name:${set}*`)
+  if (rarity) filters.push(`rarity:"${rarity}"`)
+
+  const query = filters.join(' ')
+
   const response = await api.get('/cards', {
     params: {
-      q: `name:${query}*`,
+      q: query,
       page,
       pageSize,
       orderBy: 'name',
@@ -31,9 +40,12 @@ export const getCardById = async (id) => {
 
 export const getSets = async () => {
   const response = await api.get('/sets', {
-    params: {
-      orderBy: '-releaseDate',
-    },
+    params: { orderBy: '-releaseDate' },
   })
+  return response.data
+}
+
+export const getRarities = async () => {
+  const response = await api.get('/rarities')
   return response.data
 }
