@@ -1,3 +1,4 @@
 @import "tailwindcss";
 @import "./blocks/MainLayout.css";
 @import "./blocks/Home.css";
+@import "./blocks/Search.css";

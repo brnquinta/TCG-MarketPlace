@@ -1,0 +1,110 @@
+.search {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.search__form {
+  display: flex;
+  gap: 0.75rem;
+  max-width: 600px;
+}
+
+.search__input {
+  flex: 1;
+  padding: 0.75rem 1rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  font-size: 1rem;
+  outline: none;
+  color: #111827;
+}
+
+.search__input:focus {
+  border-color: #2563eb;
+}
+
+.search__btn {
+  padding: 0.75rem 1.5rem;
+  background-color: #2563eb;
+  color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.search__btn:hover {
+  background-color: #1d4ed8;
+}
+
+.search__btn:disabled {
+  background-color: #93c5fd;
+  cursor: not-allowed;
+}
+
+.search__count {
+  font-size: 0.9rem;
+  color: #6b7280;
+}
+
+.search__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 1.5rem;
+}
+
+.search__card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  text-decoration: none;
+  background-color: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 1rem;
+  transition: box-shadow 0.2s;
+}
+
+.search__card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.search__card-img {
+  width: 100%;
+  border-radius: 6px;
+}
+
+.search__card-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.search__card-name {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #111827;
+}
+
+.search__card-set {
+  font-size: 0.8rem;
+  color: #6b7280;
+}
+
+.search__card-price {
+  font-size: 0.8rem;
+  color: #2563eb;
+  font-weight: 500;
+}
+
+.search__error {
+  color: #dc2626;
+  font-size: 0.9rem;
+}
+
+.search__empty {
+  color: #6b7280;
+  font-size: 0.9rem;
+}
