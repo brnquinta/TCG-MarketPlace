@@ -17,7 +17,7 @@ export const searchCards = async ({ name, number, set, rarity, page = 1, pageSiz
 
   if (name) filters.push(`name:${name}*`)
   if (number) filters.push(`number:${number}`)
-  if (set) filters.push(`set.name:${set}*`)
+  if (set) filters.push(`set.name:"${set}"`)
   if (rarity) filters.push(`rarity:"${rarity}"`)
 
   const query = filters.join(' ')
@@ -49,3 +49,4 @@ export const getRarities = async () => {
   const response = await api.get('/rarities')
   return response.data
 }
+

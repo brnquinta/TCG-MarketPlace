@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { searchCards, getUsdToBrl, getRarities } from '../services/pokemonTcg'
+import { searchCards, getUsdToBrl, getRarities, getSets } from '../services/pokemonTcg'
 import { Link } from 'react-router-dom'
 
 function Search() {
@@ -9,41 +9,70 @@ function Search() {
     set: '',
     rarity: '',
   })
+
+  const [showListingFilters, setShowListingFilters] = useState(false)
+  const [listingFilters, setListingFilters] = useState({
+    condition: '',
+    priceMin: '',
+    priceMax: '',
+    certified: '',
+  })
+
   const [cards, setCards] = useState([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
   const [usdToBrl, setUsdToBrl] = useState(null)
   const [rarities, setRarities] = useState([])
+  const [sets, setSets] = useState([])
   const [searched, setSearched] = useState(false)
 
   useEffect(() => {
     const fetchInitialData = async () => {
       try {
-        const [cotacao, raritiesData] = await Promise.all([
+        const [cotacao, raritiesData, setsData] = await Promise.all([
           getUsdToBrl(),
           getRarities(),
+          getSets(),
         ])
+
         setUsdToBrl(cotacao)
         setRarities(raritiesData.data)
-      } catch {
+        setSets(setsData.data)
+      } catch (err) {
+        console.error('Erro ao carregar filtros:', err)
         setUsdToBrl(5.8)
       }
     }
+
     fetchInitialData()
   }, [])
 
   const formatBrl = (usd) => {
     if (!usdToBrl || !usd) return null
-    return (usd * usdToBrl).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
+    return (usd * usdToBrl).toLocaleString('pt-BR', {
+      style: 'currency',
+      currency: 'BRL',
+    })
   }
 
   const handleChange = (e) => {
-    setFilters({ ...filters, [e.target.name]: e.target.value })
+    setFilters({
+      ...filters,
+      [e.target.name]: e.target.value,
+    })
+  }
+
+  const handleListingFilterChange = (e) => {
+    setListingFilters({
+      ...listingFilters,
+      [e.target.name]: e.target.value,
+    })
   }
 
   const handleSearch = async (e) => {
     e.preventDefault()
-    const hasFilter = Object.values(filters).some((v) => v.trim() !== '')
+
+    const hasFilter = Object.values(filters).some((value) => value.trim() !== '')
     if (!hasFilter) return
 
     setLoading(true)
@@ -53,7 +82,10 @@ function Search() {
     try {
       const data = await searchCards(filters)
       setCards(data.data)
-    } catch {
+
+      console.log('Filtros de anúncio locais:', listingFilters)
+    } catch (err) {
+      console.error('Erro ao buscar cartas:', err)
       setError('Erro ao buscar cartas. Tente novamente.')
     } finally {
       setLoading(false)
@@ -61,7 +93,20 @@ function Search() {
   }
 
   const handleClear = () => {
-    setFilters({ name: '', number: '', set: '', rarity: '' })
+    setFilters({
+      name: '',
+      number: '',
+      set: '',
+      rarity: '',
+    })
+
+    setListingFilters({
+      condition: '',
+      priceMin: '',
+      priceMax: '',
+      certified: '',
+    })
+
     setCards([])
     setSearched(false)
     setError(null)
@@ -82,6 +127,7 @@ function Search() {
               onChange={handleChange}
             />
           </div>
+
           <div className="search__filter-group">
             <label className="search__label">Número</label>
             <input
@@ -93,17 +139,24 @@ function Search() {
               onChange={handleChange}
             />
           </div>
+
           <div className="search__filter-group">
             <label className="search__label">Set</label>
-            <input
+            <select
               className="search__input"
-              type="text"
               name="set"
-              placeholder="Ex: Scarlet & Violet"
               value={filters.set}
               onChange={handleChange}
-            />
+            >
+              <option value="">Todos</option>
+              {sets.map((setItem) => (
+                <option key={setItem.id} value={setItem.name}>
+                  {setItem.name}
+                </option>
+              ))}
+            </select>
           </div>
+
           <div className="search__filter-group">
             <label className="search__label">Raridade</label>
             <select
@@ -114,20 +167,95 @@ function Search() {
             >
               <option value="">Todas</option>
               {rarities.map((r) => (
-                <option key={r} value={r}>{r}</option>
+                <option key={r} value={r}>
+                  {r}
+                </option>
               ))}
             </select>
           </div>
         </div>
 
         <div className="search__form-actions">
-          <button className="search__btn search__btn--primary" type="submit" disabled={loading}>
+       
+            <button
+            className="search__btn search__btn--primary"
+            type="submit"
+            disabled={loading}
+          >
             {loading ? 'Buscando...' : 'Buscar'}
           </button>
-          <button className="search__btn search__btn--ghost" type="button" onClick={handleClear}>
+
+          <button
+            className="search__btn search__btn--ghost"
+            type="button"
+            onClick={handleClear}
+          >
             Limpar
           </button>
         </div>
+
+        {showListingFilters && (
+          <div className="search__listing-filters">
+            <h3 className="search__listing-title">Filtros do anúncio</h3>
+
+            <div className="search__filters">
+              <div className="search__filter-group">
+                <label className="search__label">Condição</label>
+                <select
+                  className="search__input"
+                  name="condition"
+                  value={listingFilters.condition}
+                  onChange={handleListingFilterChange}
+                >
+                  <option value="">Todas</option>
+                  <option value="NM">Near Mint</option>
+                  <option value="LP">Lightly Played</option>
+                  <option value="MP">Moderately Played</option>
+                  <option value="HP">Heavily Played</option>
+                  <option value="DMG">Damaged</option>
+                </select>
+              </div>
+
+              <div className="search__filter-group">
+                <label className="search__label">Preço mínimo</label>
+                <input
+                  className="search__input"
+                  type="number"
+                  name="priceMin"
+                  placeholder="Ex: 50"
+                  value={listingFilters.priceMin}
+                  onChange={handleListingFilterChange}
+                />
+              </div>
+
+              <div className="search__filter-group">
+                <label className="search__label">Preço máximo</label>
+                <input
+                  className="search__input"
+                  type="number"
+                  name="priceMax"
+                  placeholder="Ex: 500"
+                  value={listingFilters.priceMax}
+                  onChange={handleListingFilterChange}
+                />
+              </div>
+
+              <div className="search__filter-group">
+                <label className="search__label">Certificada</label>
+                <select
+                  className="search__input"
+                  name="certified"
+                  value={listingFilters.certified}
+                  onChange={handleListingFilterChange}
+                >
+                  <option value="">Todas</option>
+                  <option value="true">Sim</option>
+                  <option value="false">Não</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        )}
       </form>
 
       {error && <p className="search__error">{error}</p>}
@@ -135,6 +263,7 @@ function Search() {
       {cards.length > 0 && (
         <div className="search__results">
           <p className="search__count">{cards.length} cartas encontradas</p>
+
           <div className="search__grid">
             {cards.map((card) => (
               <Link to={`/card/${card.id}`} key={card.id} className="search__card">
@@ -143,13 +272,18 @@ function Search() {
                   src={card.images.small}
                   alt={card.name}
                 />
+
                 <div className="search__card-info">
                   <p className="search__card-name">{card.name}</p>
                   <p className="search__card-set">{card.set.name}</p>
-                  <p className="search__card-number">#{card.number}/{card.set.printedTotal}</p>
+                  <p className="search__card-number">
+                    #{card.number}/{card.set.printedTotal}
+                  </p>
+
                   {card.rarity && (
                     <p className="search__card-rarity">{card.rarity}</p>
                   )}
+
                   {card.cardmarket?.prices?.averageSellPrice && (
                     <p className="search__card-price">
                       Ref: {formatBrl(card.cardmarket.prices.averageSellPrice)}
