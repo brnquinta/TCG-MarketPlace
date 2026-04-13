@@ -25,6 +25,13 @@ function Search() {
   const [rarities, setRarities] = useState([])
   const [sets, setSets] = useState([])
   const [searched, setSearched] = useState(false)
+  const [lastSearch, setLastSearch] = useState(null)
+
+  useEffect(() => {
+  if (cards.length > 0) {
+    console.log(cards.map((card) => card.set.name))
+  }
+}, [cards])
 
   useEffect(() => {
     const fetchInitialData = async () => {
@@ -69,28 +76,30 @@ function Search() {
     })
   }
 
-  const handleSearch = async (e) => {
-    e.preventDefault()
+const handleSearch = async (e) => {
+  e.preventDefault()
 
-    const hasFilter = Object.values(filters).some((value) => value.trim() !== '')
-    if (!hasFilter) return
+  const hasFilter = Object.values(filters).some((value) => value.trim() !== '')
+  if (!hasFilter) return
 
-    setLoading(true)
-    setError(null)
-    setSearched(true)
+  const currentSearch = JSON.stringify(filters)
+  if (currentSearch === lastSearch) return
 
-    try {
-      const data = await searchCards(filters)
-      setCards(data.data)
+  setLoading(true)
+  setError(null)
+  setSearched(true)
 
-      console.log('Filtros de anúncio locais:', listingFilters)
-    } catch (err) {
-      console.error('Erro ao buscar cartas:', err)
-      setError('Erro ao buscar cartas. Tente novamente.')
-    } finally {
-      setLoading(false)
-    }
+  try {
+    const data = await searchCards(filters)
+    setCards(data.data)
+    setLastSearch(currentSearch)
+  } catch (err) {
+    console.error('Erro ao buscar cartas:', err)
+    setError('Erro ao buscar cartas. Tente novamente.')
+  } finally {
+    setLoading(false)
   }
+}
 
   const handleClear = () => {
     setFilters({
@@ -307,6 +316,24 @@ function Search() {
                     <option value="true">Sim</option>
                     <option value="false">Não</option>
                   </select>
+                      
+                
+                 <div className="search__filter-group">
+                <label className="search__label">Indioma</label>
+                  <select
+                      className="search__input"
+                      name="language"
+                      value={listingFilters.language}
+                      onChange={handleListingFilterChange}
+>                   
+                    <option value="">Todos</option>
+                    <option value="portugues">Português</option>
+                    <option value="ingles">Inglês</option>
+                    <option value="japones">Japonês</option>
+                    <option value="espanhol">Espanhol</option>
+                    <option value="outros">Outros</option>
+                  </select>
+                  </div>
                 </div>
               </div>
             </div>
