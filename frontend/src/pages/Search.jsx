@@ -177,6 +177,16 @@ function Search() {
 
         <div className="search__form-actions">
        
+
+          <button
+            className="search__btn search__btn--ghost"
+            type="button"
+            onClick={() => setShowListingFilters(!showListingFilters)}
+          >
+            {showListingFilters ? 'Fechar filtros' : 'Filtros'}
+          </button>
+
+
             <button
             className="search__btn search__btn--primary"
             type="submit"
