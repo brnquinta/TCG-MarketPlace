@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo, useRef } from 'react'
 import { searchCards, getUsdToBrl, getRarities, getSets } from '../services/pokemonTcg'
 import { Link } from 'react-router-dom'
 
@@ -16,6 +16,7 @@ function Search() {
     priceMin: '',
     priceMax: '',
     certified: '',
+    language: '',
   })
 
   const [cards, setCards] = useState([])
@@ -27,11 +28,10 @@ function Search() {
   const [searched, setSearched] = useState(false)
   const [lastSearch, setLastSearch] = useState(null)
 
-  useEffect(() => {
-  if (cards.length > 0) {
-    console.log(cards.map((card) => card.set.name))
-  }
-}, [cards])
+  const [setQuery, setSetQuery] = useState('')
+  const [showSetSuggestions, setShowSetSuggestions] = useState(false)
+
+  const setAutocompleteRef = useRef(null)
 
   useEffect(() => {
     const fetchInitialData = async () => {
@@ -54,8 +54,38 @@ function Search() {
     fetchInitialData()
   }, [])
 
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (
+        setAutocompleteRef.current &&
+        !setAutocompleteRef.current.contains(event.target)
+      ) {
+        setShowSetSuggestions(false)
+      }
+    }
+
+    document.addEventListener('mousedown', handleClickOutside)
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside)
+    }
+  }, [])
+
+  const filteredSets = useMemo(() => {
+    const normalizedQuery = setQuery.trim().toLowerCase()
+
+    if (!normalizedQuery) return []
+
+    return sets
+      .filter((setItem) =>
+        setItem.name.toLowerCase().includes(normalizedQuery)
+      )
+      .slice(0, 8)
+  }, [sets, setQuery])
+
   const formatBrl = (usd) => {
     if (!usdToBrl || !usd) return null
+
     return (usd * usdToBrl).toLocaleString('pt-BR', {
       style: 'currency',
       currency: 'BRL',
@@ -76,30 +106,68 @@ function Search() {
     })
   }
 
-const handleSearch = async (e) => {
-  e.preventDefault()
+  const handleSetInputChange = (e) => {
+    const value = e.target.value
 
-  const hasFilter = Object.values(filters).some((value) => value.trim() !== '')
-  if (!hasFilter) return
+    setSetQuery(value)
+    setShowSetSuggestions(true)
 
-  const currentSearch = JSON.stringify(filters)
-  if (currentSearch === lastSearch) return
-
-  setLoading(true)
-  setError(null)
-  setSearched(true)
-
-  try {
-    const data = await searchCards(filters)
-    setCards(data.data)
-    setLastSearch(currentSearch)
-  } catch (err) {
-    console.error('Erro ao buscar cartas:', err)
-    setError('Erro ao buscar cartas. Tente novamente.')
-  } finally {
-    setLoading(false)
+    setFilters({
+      ...filters,
+      set: value,
+    })
   }
-}
+
+  const handleSelectSet = (setName) => {
+    setSetQuery(setName)
+    setShowSetSuggestions(false)
+
+    setFilters({
+      ...filters,
+      set: setName,
+    })
+  }
+
+  const handleSetInputFocus = () => {
+    if (setQuery.trim() !== '') {
+      setShowSetSuggestions(true)
+    }
+  }
+
+  const handleSetInputKeyDown = (e) => {
+    if (e.key === 'Escape') {
+      setShowSetSuggestions(false)
+    }
+  }
+
+  const handleSearch = async (e) => {
+    e.preventDefault()
+
+    const hasFilter = Object.values(filters).some(
+      (value) => value.trim() !== ''
+    )
+
+    if (!hasFilter) return
+
+    const currentSearch = JSON.stringify(filters)
+
+    if (currentSearch === lastSearch) return
+
+    setLoading(true)
+    setError(null)
+    setSearched(true)
+
+    try {
+      const data = await searchCards(filters)
+      setCards(data.data)
+      setLastSearch(currentSearch)
+    } catch (err) {
+      console.error('Erro ao buscar cartas:', err)
+      setError('Erro ao buscar cartas. Tente novamente.')
+    } finally {
+      setLoading(false)
+    }
+  }
 
   const handleClear = () => {
     setFilters({
@@ -114,12 +182,16 @@ const handleSearch = async (e) => {
       priceMin: '',
       priceMax: '',
       certified: '',
+      language: '',
     })
 
+    setSetQuery('')
+    setShowSetSuggestions(false)
     setCards([])
     setSearched(false)
     setError(null)
     setShowListingFilters(false)
+    setLastSearch(null)
   }
 
   return (
@@ -152,21 +224,34 @@ const handleSearch = async (e) => {
                 />
               </div>
 
-              <div className="search__filter-group">
+              <div className="search__filter-group search__filter-group--autocomplete" ref={setAutocompleteRef}>
                 <label className="search__label">Set</label>
-                <select
+                <input
                   className="search__input"
+                  type="text"
                   name="set"
-                  value={filters.set}
-                  onChange={handleChange}
-                >
-                  <option value="">Todos</option>
-                  {sets.map((setItem) => (
-                    <option key={setItem.id} value={setItem.name}>
-                      {setItem.name}
-                    </option>
-                  ))}
-                </select>
+                  placeholder="Digite o nome do set"
+                  value={setQuery}
+                  onChange={handleSetInputChange}
+                  onFocus={handleSetInputFocus}
+                  onKeyDown={handleSetInputKeyDown}
+                  autoComplete="off"
+                />
+
+                {showSetSuggestions && filteredSets.length > 0 && (
+                  <div className="search__autocomplete">
+                    {filteredSets.map((setItem) => (
+                      <button
+                        key={setItem.id}
+                        className="search__autocomplete-item"
+                        type="button"
+                        onClick={() => handleSelectSet(setItem.name)}
+                      >
+                        {setItem.name}
+                      </button>
+                    ))}
+                  </div>
+                )}
               </div>
 
               <div className="search__filter-group">
@@ -178,9 +263,9 @@ const handleSearch = async (e) => {
                   onChange={handleChange}
                 >
                   <option value="">Todas</option>
-                  {rarities.map((r) => (
-                    <option key={r} value={r}>
-                      {r}
+                  {rarities.map((rarity) => (
+                    <option key={rarity} value={rarity}>
+                      {rarity}
                     </option>
                   ))}
                 </select>
@@ -222,7 +307,11 @@ const handleSearch = async (e) => {
 
               <div className="search__grid">
                 {cards.map((card) => (
-                  <Link to={`/card/${card.id}`} key={card.id} className="search__card">
+                  <Link
+                    to={`/card/${card.id}`}
+                    key={card.id}
+                    className="search__card"
+                  >
                     <img
                       className="search__card-img"
                       src={card.images.small}
@@ -253,7 +342,9 @@ const handleSearch = async (e) => {
           )}
 
           {!loading && searched && cards.length === 0 && (
-            <p className="search__empty">Nenhuma carta encontrada com esses filtros.</p>
+            <p className="search__empty">
+              Nenhuma carta encontrada com esses filtros.
+            </p>
           )}
         </div>
 
@@ -316,16 +407,16 @@ const handleSearch = async (e) => {
                     <option value="true">Sim</option>
                     <option value="false">Não</option>
                   </select>
-                      
-                
-                 <div className="search__filter-group">
-                <label className="search__label">Indioma</label>
+                </div>
+
+                <div className="search__filter-group">
+                  <label className="search__label">Idioma</label>
                   <select
-                      className="search__input"
-                      name="language"
-                      value={listingFilters.language}
-                      onChange={handleListingFilterChange}
->                   
+                    className="search__input"
+                    name="language"
+                    value={listingFilters.language}
+                    onChange={handleListingFilterChange}
+                  >
                     <option value="">Todos</option>
                     <option value="portugues">Português</option>
                     <option value="ingles">Inglês</option>
@@ -333,7 +424,6 @@ const handleSearch = async (e) => {
                     <option value="espanhol">Espanhol</option>
                     <option value="outros">Outros</option>
                   </select>
-                  </div>
                 </div>
               </div>
             </div>

@@ -42,6 +42,7 @@ export const getSets = async () => {
   const response = await api.get('/sets', {
     params: { orderBy: '-releaseDate' },
   })
+  
   return response.data
 }
 
