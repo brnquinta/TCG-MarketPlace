@@ -263,7 +263,35 @@
 .store-dashboard__text-link:hover {
   text-decoration: underline;
 }
+.store-dashboard__rating {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-top: 0.25rem;
+  padding: 0.5rem 0.75rem;
+  width: fit-content;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 999px;
+  box-shadow: 0 8px 20px rgba(17, 24, 39, 0.04);
+}
 
+.store-dashboard__rating-star {
+  font-size: 1rem;
+  line-height: 1;
+  color: #f59e0b;
+}
+
+.store-dashboard__rating-value {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #111827;
+}
+
+.store-dashboard__rating-count {
+  font-size: 0.9rem;
+  color: #6b7280;
+}
 @media (max-width: 960px) {
   .store-dashboard__layout {
     grid-template-columns: 1fr;

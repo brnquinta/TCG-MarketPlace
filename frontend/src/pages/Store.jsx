@@ -18,6 +18,8 @@ function Store() {
     stats: {
       listingsCount: 6,
       salesCount: 18,
+      rating: 4.8,
+      reviewsCount: 24,
     },
   }
 
@@ -99,6 +101,16 @@ function Store() {
           <div className="store__stat">
             <span className="store__stat-value">{store.stats.salesCount}</span>
             <span className="store__stat-label">Vendas</span>
+          </div>
+
+          <div className="store__stat">
+            <span className="store__stat-value store__stat-value--rating">
+              <span className="store__rating-star">★</span>
+              {store.stats.rating}
+            </span>
+            <span className="store__stat-label">
+              {store.stats.reviewsCount} avaliações
+            </span>
           </div>
         </div>
       </div>

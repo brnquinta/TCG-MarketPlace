@@ -1,22 +1,26 @@
 import { Link } from 'react-router-dom'
 
 function StoreDashboard() {
-  const store = {
-    name: 'Loja do Bruno TCG',
-    slug: 'loja-do-bruno-tcg',
-    description: 'Loja focada em cartas Pokémon para coleção e competitivo.',
-    location: {
-      city: 'Rio de Janeiro',
-      state: 'RJ',
-    },
-    status: 'draft',
-    onboardingStatus: 'pending',
-    stats: {
-      activeListings: 0,
-      totalSales: 0,
-      totalViews: 0,
-    },
-  }
+const store = {
+  name: 'Loja do Bruno TCG',
+  slug: 'loja-do-bruno-tcg',
+  description: 'Loja focada em cartas Pokémon para coleção e competitivo.',
+  location: {
+    city: 'Rio de Janeiro',
+    state: 'RJ',
+  },
+  status: 'draft',
+  onboardingStatus: 'pending',
+  rating: {
+    average: 4.8,
+    reviewsCount: 24,
+  },
+  stats: {
+    activeListings: 0,
+    totalSales: 0,
+    totalViews: 0,
+  },
+}
 
   const nextSteps = [
     {
@@ -60,11 +64,17 @@ function StoreDashboard() {
     <section className="store-dashboard">
       <div className="store-dashboard__header">
         <div className="store-dashboard__header-content">
-          <p className="store-dashboard__eyebrow">Painel da loja</p>
-          <h1 className="store-dashboard__title">{store.name}</h1>
-          <p className="store-dashboard__subtitle">
+            <p className="store-dashboard__eyebrow">Painel da loja</p>
+            <h1 className="store-dashboard__title">{store.name}</h1>
+            <p className="store-dashboard__subtitle">
             Gerencie sua loja, acompanhe o status da conta e publique seus anúncios.
-          </p>
+            </p>
+
+            <div className="store-dashboard__rating">
+              <span className="store-dashboard__rating-star">★</span>
+              <span className="store-dashboard__rating-value">4.8</span>
+              <span className="store-dashboard__rating-count">(24 reviews)</span>
+            </div>
         </div>
 
         <div className="store-dashboard__header-actions">
