@@ -36,14 +36,7 @@ const store = {
       description: 'Preencha CPF/CNPJ, telefone, endereço e dados de repasse.',
       actionLabel: 'Fazer onboarding',
       actionPath: '/store/onboarding',
-    },
-    {
-      id: 3,
-      title: 'Criar primeiro anúncio',
-      description: 'Publique sua primeira carta para começar a vender.',
-      actionLabel: 'Novo anúncio',
-      actionPath: '/new-listing',
-    },
+    }
   ]
 
   const recentListings = []
