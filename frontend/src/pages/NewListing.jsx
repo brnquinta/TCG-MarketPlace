@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import useCardSearch from '../hooks/useCardSearch'
 import { CARD_CONDITIONS } from '../../utils/cardConditions'
+import { CARD_LANGUAGE_FORM_OPTIONS } from '../../utils/cardLanguages'
 
 function NewListing() {
   const [listingData, setListingData] = useState({
@@ -382,20 +383,20 @@ function NewListing() {
                       Idioma
                     </label>
                     <select
-                      id="language"
-                      className="newListing__select"
-                      name="language"
-                      value={listingData.language}
-                      onChange={handleListingChange}
-                    >
-                      <option value="">Selecione</option>
-                      <option value="pt-BR">Português</option>
-                      <option value="en">Inglês</option>
-                      <option value="jp">Japonês</option>
-                      <option value="es">Espanhol</option>
-                      <option value="de">Alemão</option>
-                      <option value="fr">Francês</option>
-                      <option value="it">Italiano</option>
+                        id="language"
+                        className="newListing__select"
+                        name="language"
+                        value={listingData.language}
+                        onChange={handleListingChange}
+  >                 
+                        {CARD_LANGUAGE_FORM_OPTIONS.map((language) => (
+                          <option
+                            key={language.value || 'placeholder'}
+                            value={language.value}
+                          >
+                            {language.label}
+                          </option>
+                        ))}
                     </select>
                   </div>
 

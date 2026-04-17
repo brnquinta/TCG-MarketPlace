@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import useCardSearch from '../hooks/useCardSearch'
 import { CARD_CONDITION_FILTER_OPTIONS } from '../../utils/cardConditions'
+import { CARD_LANGUAGE_FILTER_OPTIONS } from '../../utils/cardLanguages'
 
 function Search() {
   const [showListingFilters, setShowListingFilters] = useState(false)
@@ -284,22 +285,23 @@ function Search() {
                   </select>
                 </div>
 
-                <div className="search__filter-group">
-                  <label className="search__label">Idioma</label>
-                  <select
-                    className="search__input"
-                    name="language"
-                    value={listingFilters.language}
-                    onChange={handleListingFilterChange}
-                  >
-                    <option value="">Todos</option>
-                    <option value="portugues">Português</option>
-                    <option value="ingles">Inglês</option>
-                    <option value="japones">Japonês</option>
-                    <option value="espanhol">Espanhol</option>
-                    <option value="outros">Outros</option>
-                  </select>
-                </div>
+                  <div className="search__filter-group">
+                    <label className="search__label">Idioma</label>
+
+                    {/* Ajustado para usar o utils de idiomas */}
+                    <select
+                      className="search__input"
+                      name="language"
+                      value={listingFilters.language}
+                      onChange={handleListingFilterChange}
+                    >
+                      {CARD_LANGUAGE_FILTER_OPTIONS.map((language) => (
+                        <option key={language.value || 'all'} value={language.value}>
+                          {language.label}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
               </div>
             </div>
           </aside>
