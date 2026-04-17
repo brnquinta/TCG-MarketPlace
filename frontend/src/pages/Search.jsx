@@ -73,6 +73,7 @@ function Search() {
 
   const filteredSets = useMemo(() => {
     const normalizedQuery = setQuery.trim().toLowerCase()
+    
 
     if (!normalizedQuery) return []
 
@@ -139,17 +140,25 @@ function Search() {
       setShowSetSuggestions(false)
     }
   }
+  
 
   const handleSearch = async (e) => {
     e.preventDefault()
 
-    const hasFilter = Object.values(filters).some(
-      (value) => value.trim() !== ''
+    const normalizedFilters = {
+  ...filters,
+  name: filters.name.trim(),
+}
+
+    const hasFilter = Object.values(normalizedFilters).some(
+    (value) => typeof value === 'string' ? value !== '' : Boolean(value)
     )
+
+    
 
     if (!hasFilter) return
 
-    const currentSearch = JSON.stringify(filters)
+    const currentSearch = JSON.stringify(normalizedFilters)
 
     if (currentSearch === lastSearch) return
 
@@ -158,7 +167,7 @@ function Search() {
     setSearched(true)
 
     try {
-      const data = await searchCards(filters)
+      const data = await searchCards(normalizedFilters)
       setCards(data.data)
       setLastSearch(currentSearch)
     } catch (err) {
@@ -224,7 +233,10 @@ function Search() {
                 />
               </div>
 
-              <div className="search__filter-group search__filter-group--autocomplete" ref={setAutocompleteRef}>
+              <div
+                className="search__filter-group search__filter-group--autocomplete"
+                ref={setAutocompleteRef}
+              >
                 <label className="search__label">Set</label>
                 <input
                   className="search__input"
@@ -301,50 +313,60 @@ function Search() {
 
           {error && <p className="search__error">{error}</p>}
 
+          {!searched && !loading && (
+            <section className="search__results-box search__results-box--placeholder">
+              <p className="search__placeholder-text">Pesquise uma carta</p>
+            </section>
+          )}
+
           {cards.length > 0 && (
-            <div className="search__results">
-              <p className="search__count">{cards.length} cartas encontradas</p>
+            <section className="search__results-box">
+              <div className="search__results">
+                <p className="search__count">{cards.length} cartas encontradas</p>
 
-              <div className="search__grid">
-                {cards.map((card) => (
-                  <Link
-                    to={`/card/${card.id}`}
-                    key={card.id}
-                    className="search__card"
-                  >
-                    <img
-                      className="search__card-img"
-                      src={card.images.small}
-                      alt={card.name}
-                    />
+                <div className="search__grid">
+                  {cards.map((card) => (
+                    <Link
+                      to={`/card/${card.id}`}
+                      key={card.id}
+                      className="search__card"
+                    >
+                      <img
+                        className="search__card-img"
+                        src={card.images.small}
+                        alt={card.name}
+                      />
 
-                    <div className="search__card-info">
-                      <p className="search__card-name">{card.name}</p>
-                      <p className="search__card-set">{card.set.name}</p>
-                      <p className="search__card-number">
-                        #{card.number}/{card.set.printedTotal}
-                      </p>
-
-                      {card.rarity && (
-                        <p className="search__card-rarity">{card.rarity}</p>
-                      )}
-
-                      {card.cardmarket?.prices?.averageSellPrice && (
-                        <p className="search__card-price">
-                          Ref: {formatBrl(card.cardmarket.prices.averageSellPrice)}
+                      <div className="search__card-info">
+                        <p className="search__card-name">{card.name}</p>
+                        <p className="search__card-set">{card.set.name}</p>
+                        <p className="search__card-number">
+                          #{card.number}/{card.set.printedTotal}
                         </p>
-                      )}
-                    </div>
-                  </Link>
-                ))}
+
+                        {card.rarity && (
+                          <p className="search__card-rarity">{card.rarity}</p>
+                        )}
+
+                        {card.cardmarket?.prices?.averageSellPrice && (
+                          <p className="search__card-price">
+                            Ref: {formatBrl(card.cardmarket.prices.averageSellPrice)}
+                          </p>
+                        )}
+                      </div>
+                    </Link>
+                  ))}
+                </div>
               </div>
-            </div>
+            </section>
           )}
 
           {!loading && searched && cards.length === 0 && (
-            <p className="search__empty">
-              Nenhuma carta encontrada com esses filtros.
-            </p>
+            <section className="search__results-box search__results-box--empty">
+              <p className="search__empty">
+                Nenhuma carta encontrada com esses filtros.
+              </p>
+            </section>
           )}
         </div>
 
