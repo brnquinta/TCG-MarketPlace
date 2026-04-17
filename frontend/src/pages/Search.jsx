@@ -1,15 +1,9 @@
-import { useState, useEffect, useMemo, useRef } from 'react'
-import { searchCards, getUsdToBrl, getRarities, getSets } from '../services/pokemonTcg'
+import { useState } from 'react'
 import { Link } from 'react-router-dom'
+import useCardSearch from '../hooks/useCardSearch'
+import { CARD_CONDITION_FILTER_OPTIONS } from '../../utils/cardConditions'
 
 function Search() {
-  const [filters, setFilters] = useState({
-    name: '',
-    number: '',
-    set: '',
-    rarity: '',
-  })
-
   const [showListingFilters, setShowListingFilters] = useState(false)
   const [listingFilters, setListingFilters] = useState({
     condition: '',
@@ -19,172 +13,38 @@ function Search() {
     language: '',
   })
 
-  const [cards, setCards] = useState([])
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState(null)
-  const [usdToBrl, setUsdToBrl] = useState(null)
-  const [rarities, setRarities] = useState([])
-  const [sets, setSets] = useState([])
-  const [searched, setSearched] = useState(false)
-  const [lastSearch, setLastSearch] = useState(null)
-
-  const [setQuery, setSetQuery] = useState('')
-  const [showSetSuggestions, setShowSetSuggestions] = useState(false)
-
-  const setAutocompleteRef = useRef(null)
-
-  useEffect(() => {
-    const fetchInitialData = async () => {
-      try {
-        const [cotacao, raritiesData, setsData] = await Promise.all([
-          getUsdToBrl(),
-          getRarities(),
-          getSets(),
-        ])
-
-        setUsdToBrl(cotacao)
-        setRarities(raritiesData.data)
-        setSets(setsData.data)
-      } catch (err) {
-        console.error('Erro ao carregar filtros:', err)
-        setUsdToBrl(5.8)
-      }
-    }
-
-    fetchInitialData()
-  }, [])
-
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (
-        setAutocompleteRef.current &&
-        !setAutocompleteRef.current.contains(event.target)
-      ) {
-        setShowSetSuggestions(false)
-      }
-    }
-
-    document.addEventListener('mousedown', handleClickOutside)
-
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside)
-    }
-  }, [])
-
-  const filteredSets = useMemo(() => {
-    const normalizedQuery = setQuery.trim().toLowerCase()
-    
-
-    if (!normalizedQuery) return []
-
-    return sets
-      .filter((setItem) =>
-        setItem.name.toLowerCase().includes(normalizedQuery)
-      )
-      .slice(0, 8)
-  }, [sets, setQuery])
-
-  const formatBrl = (usd) => {
-    if (!usdToBrl || !usd) return null
-
-    return (usd * usdToBrl).toLocaleString('pt-BR', {
-      style: 'currency',
-      currency: 'BRL',
-    })
-  }
-
-  const handleChange = (e) => {
-    setFilters({
-      ...filters,
-      [e.target.name]: e.target.value,
-    })
-  }
+  const {
+    filters,
+    cards,
+    loading,
+    error,
+    rarities,
+    searched,
+    setQuery,
+    showSetSuggestions,
+    filteredSets,
+    setAutocompleteRef,
+    formatBrl,
+    handleChange,
+    handleSetInputChange,
+    handleSelectSet,
+    handleSetInputFocus,
+    handleSetInputKeyDown,
+    handleSearch,
+    handleClear,
+  } = useCardSearch()
 
   const handleListingFilterChange = (e) => {
-    setListingFilters({
-      ...listingFilters,
-      [e.target.name]: e.target.value,
-    })
+    const { name, value } = e.target
+
+    setListingFilters((prev) => ({
+      ...prev,
+      [name]: value,
+    }))
   }
 
-  const handleSetInputChange = (e) => {
-    const value = e.target.value
-
-    setSetQuery(value)
-    setShowSetSuggestions(true)
-
-    setFilters({
-      ...filters,
-      set: value,
-    })
-  }
-
-  const handleSelectSet = (setName) => {
-    setSetQuery(setName)
-    setShowSetSuggestions(false)
-
-    setFilters({
-      ...filters,
-      set: setName,
-    })
-  }
-
-  const handleSetInputFocus = () => {
-    if (setQuery.trim() !== '') {
-      setShowSetSuggestions(true)
-    }
-  }
-
-  const handleSetInputKeyDown = (e) => {
-    if (e.key === 'Escape') {
-      setShowSetSuggestions(false)
-    }
-  }
-  
-
-  const handleSearch = async (e) => {
-    e.preventDefault()
-
-    const normalizedFilters = {
-  ...filters,
-  name: filters.name.trim(),
-}
-
-    const hasFilter = Object.values(normalizedFilters).some(
-    (value) => typeof value === 'string' ? value !== '' : Boolean(value)
-    )
-
-    
-
-    if (!hasFilter) return
-
-    const currentSearch = JSON.stringify(normalizedFilters)
-
-    if (currentSearch === lastSearch) return
-
-    setLoading(true)
-    setError(null)
-    setSearched(true)
-
-    try {
-      const data = await searchCards(normalizedFilters)
-      setCards(data.data)
-      setLastSearch(currentSearch)
-    } catch (err) {
-      console.error('Erro ao buscar cartas:', err)
-      setError('Erro ao buscar cartas. Tente novamente.')
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  const handleClear = () => {
-    setFilters({
-      name: '',
-      number: '',
-      set: '',
-      rarity: '',
-    })
+  const handleClearAll = () => {
+    handleClear()
 
     setListingFilters({
       condition: '',
@@ -194,13 +54,7 @@ function Search() {
       language: '',
     })
 
-    setSetQuery('')
-    setShowSetSuggestions(false)
-    setCards([])
-    setSearched(false)
-    setError(null)
     setShowListingFilters(false)
-    setLastSearch(null)
   }
 
   return (
@@ -288,7 +142,7 @@ function Search() {
               <button
                 className="search__btn search__btn--ghost"
                 type="button"
-                onClick={() => setShowListingFilters(!showListingFilters)}
+                onClick={() => setShowListingFilters((prev) => !prev)}
               >
                 {showListingFilters ? 'Fechar filtros' : 'Filtros'}
               </button>
@@ -304,7 +158,7 @@ function Search() {
               <button
                 className="search__btn search__btn--ghost"
                 type="button"
-                onClick={handleClear}
+                onClick={handleClearAll}
               >
                 Limpar
               </button>
@@ -379,18 +233,17 @@ function Search() {
                 <div className="search__filter-group">
                   <label className="search__label">Condição</label>
                   <select
-                    className="search__input"
-                    name="condition"
-                    value={listingFilters.condition}
-                    onChange={handleListingFilterChange}
-                  >
-                    <option value="">Todas</option>
-                    <option value="NM">Near Mint</option>
-                    <option value="LP">Lightly Played</option>
-                    <option value="MP">Moderately Played</option>
-                    <option value="HP">Heavily Played</option>
-                    <option value="DMG">Damaged</option>
-                  </select>
+                     className="search__input"
+                     name="condition"
+                     value={listingFilters.condition}
+                     onChange={handleListingFilterChange}
+>                   
+                     {CARD_CONDITION_FILTER_OPTIONS.map((condition) => (
+                       <option key={condition.value || 'all'} value={condition.value}>
+                         {condition.label}
+                       </option>
+                     ))}
+                    </select>
                 </div>
 
                 <div className="search__filter-group">
