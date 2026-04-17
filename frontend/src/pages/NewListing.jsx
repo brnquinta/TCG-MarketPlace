@@ -1,7 +1,34 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import useCardSearch from '../hooks/useCardSearch'
 import { CARD_CONDITIONS } from '../../utils/cardConditions'
 import { CARD_LANGUAGE_FORM_OPTIONS } from '../../utils/cardLanguages'
+
+const PHOTO_STEPS = [
+  {
+    key: 'front90',
+    title: 'Frente — 90°',
+    instruction: 'Mesa escura, luz sobre o produto e topo para cima.',
+    alt: 'Preview frente 90 graus',
+  },
+  {
+    key: 'back90',
+    title: 'Verso — 90°',
+    instruction: 'Mesa escura, luz sobre o produto e topo para cima.',
+    alt: 'Preview verso 90 graus',
+  },
+  {
+    key: 'front45',
+    title: 'Frente — 45°',
+    instruction: 'Mesa escura, luz sobre o produto e inclinação de 45°.',
+    alt: 'Preview frente 45 graus',
+  },
+  {
+    key: 'back45',
+    title: 'Verso — 45°',
+    instruction: 'Mesa escura, luz sobre o produto e inclinação de 45°.',
+    alt: 'Preview verso 45 graus',
+  },
+]
 
 function NewListing() {
   const [listingData, setListingData] = useState({
@@ -19,10 +46,22 @@ function NewListing() {
     localPickup: false,
     city: '',
     state: '',
-    photos: null,
+    requiredPhotos: {
+      front90: null,
+      back90: null,
+      front45: null,
+      back45: null,
+    },
   })
 
   const [selectedCard, setSelectedCard] = useState(null)
+  const [photoPreviews, setPhotoPreviews] = useState({
+    front90: '',
+    back90: '',
+    front45: '',
+    back45: '',
+  })
+  const [activePhotoStep, setActivePhotoStep] = useState(0)
 
   const {
     filters,
@@ -44,18 +83,74 @@ function NewListing() {
     handleClear,
   } = useCardSearch()
 
+  const currentPhotoStep = PHOTO_STEPS[activePhotoStep]
+  const currentPhotoFile = listingData.requiredPhotos[currentPhotoStep.key]
+  const currentPhotoPreview = photoPreviews[currentPhotoStep.key]
+
+  const completedPhotoSteps = useMemo(() => {
+    return PHOTO_STEPS.filter((step) => listingData.requiredPhotos[step.key]).length
+  }, [listingData.requiredPhotos])
+
+  const allPhotosSent = completedPhotoSteps === PHOTO_STEPS.length
+
   const handleListingChange = (e) => {
-    const { name, value, type, checked, files } = e.target
+    const { name, value, type, checked } = e.target
 
     setListingData((prev) => ({
       ...prev,
-      [name]:
-        type === 'checkbox'
-          ? checked
-          : type === 'file'
-            ? files
-            : value,
+      [name]: type === 'checkbox' ? checked : value,
     }))
+  }
+
+  const handleRequiredPhotoChange = (e) => {
+    const { name, files } = e.target
+    const file = files?.[0] || null
+
+    setListingData((prev) => ({
+      ...prev,
+      requiredPhotos: {
+        ...prev.requiredPhotos,
+        [name]: file,
+      },
+    }))
+
+    setPhotoPreviews((prev) => ({
+      ...prev,
+      [name]: file ? URL.createObjectURL(file) : '',
+    }))
+  }
+
+  const handleRemoveRequiredPhoto = (photoKey) => {
+    setListingData((prev) => ({
+      ...prev,
+      requiredPhotos: {
+        ...prev.requiredPhotos,
+        [photoKey]: null,
+      },
+    }))
+
+    setPhotoPreviews((prev) => ({
+      ...prev,
+      [photoKey]: '',
+    }))
+  }
+
+  const handleNextPhotoStep = () => {
+    setActivePhotoStep((prev) =>
+      prev < PHOTO_STEPS.length - 1 ? prev + 1 : prev
+    )
+  }
+
+  const handlePrevPhotoStep = () => {
+    setActivePhotoStep((prev) => (prev > 0 ? prev - 1 : prev))
+  }
+
+  const handleGoToPhotoStep = (stepIndex) => {
+    setActivePhotoStep(stepIndex)
+  }
+
+  const getPhotoStatus = (file) => {
+    return file ? 'Enviada' : 'Pendente'
   }
 
   const handleResetCardSearch = () => {
@@ -75,6 +170,13 @@ function NewListing() {
     e.preventDefault()
 
     if (!selectedCard) {
+      return
+    }
+
+    const { front90, back90, front45, back45 } = listingData.requiredPhotos
+
+    if (!front90 || !back90 || !front45 || !back45) {
+      console.log('Envie as 4 fotos obrigatórias do item.')
       return
     }
 
@@ -108,7 +210,12 @@ function NewListing() {
         localPickup: listingData.localPickup,
         city: listingData.city.trim(),
         state: listingData.state.trim(),
-        photos: listingData.photos,
+        requiredPhotos: {
+          front90,
+          back90,
+          front45,
+          back45,
+        },
       },
     }
 
@@ -383,20 +490,20 @@ function NewListing() {
                       Idioma
                     </label>
                     <select
-                        id="language"
-                        className="newListing__select"
-                        name="language"
-                        value={listingData.language}
-                        onChange={handleListingChange}
-  >                 
-                        {CARD_LANGUAGE_FORM_OPTIONS.map((language) => (
-                          <option
-                            key={language.value || 'placeholder'}
-                            value={language.value}
-                          >
-                            {language.label}
-                          </option>
-                        ))}
+                      id="language"
+                      className="newListing__select"
+                      name="language"
+                      value={listingData.language}
+                      onChange={handleListingChange}
+                    >
+                      {CARD_LANGUAGE_FORM_OPTIONS.map((language) => (
+                        <option
+                          key={language.value || 'placeholder'}
+                          value={language.value}
+                        >
+                          {language.label}
+                        </option>
+                      ))}
                     </select>
                   </div>
 
@@ -404,8 +511,6 @@ function NewListing() {
                     <label className="newListing__label" htmlFor="condition">
                       Condição
                     </label>
-
-                    {/* Ajustado para usar listingData e o utils de condições */}
                     <select
                       id="condition"
                       className="newListing__select"
@@ -560,18 +665,148 @@ function NewListing() {
                   </div>
 
                   <div className="newListing__field-group newListing__field-group--full">
-                    <label className="newListing__label" htmlFor="photos">
-                      Fotos reais do item
+                    <label className="newListing__label">
+                      Fotos obrigatórias do item
                     </label>
-                    <input
-                      id="photos"
-                      className="newListing__input"
-                      type="file"
-                      name="photos"
-                      multiple
-                      accept="image/*"
-                      onChange={handleListingChange}
-                    />
+
+                    <p className="newListing__helper">
+                      Envie uma foto por etapa. Isso reduz a altura da tela e guia
+                      o seller no fluxo correto.
+                    </p>
+
+                    <div className="newListing__stepper">
+                      <div className="newListing__stepper-progress">
+                        <div className="newListing__stepper-track" />
+
+                        {PHOTO_STEPS.map((step, index) => {
+                          const isCompleted = Boolean(
+                            listingData.requiredPhotos[step.key]
+                          )
+                          const isActive = activePhotoStep === index
+
+                          return (
+                            <button
+                              key={step.key}
+                              type="button"
+                              className={`newListing__stepper-dot ${
+                                isActive ? 'newListing__stepper-dot--active' : ''
+                              } ${
+                                isCompleted
+                                  ? 'newListing__stepper-dot--completed'
+                                  : ''
+                              }`}
+                              onClick={() => handleGoToPhotoStep(index)}
+                            >
+                              <span className="newListing__stepper-dot-number">
+                                {index + 1}
+                              </span>
+                              <span className="newListing__stepper-dot-label">
+                                {step.title}
+                              </span>
+                            </button>
+                          )
+                        })}
+                      </div>
+
+                      <div className="newListing__stepper-summary">
+                        <span className="newListing__stepper-summary-text">
+                          {completedPhotoSteps} de {PHOTO_STEPS.length} fotos enviadas
+                        </span>
+                      </div>
+
+                      <div className="newListing__stepper-card">
+                        <div className="newListing__photo-step-header">
+                          <div className="newListing__stepper-card-title-wrap">
+                            <p className="newListing__stepper-card-step">
+                              Etapa {activePhotoStep + 1}
+                            </p>
+                            <h3 className="newListing__stepper-card-title">
+                              {currentPhotoStep.title}
+                            </h3>
+                          </div>
+
+                          <span
+                            className={`newListing__photo-status ${
+                              currentPhotoFile
+                                ? 'newListing__photo-status--sent'
+                                : 'newListing__photo-status--pending'
+                            }`}
+                          >
+                            {getPhotoStatus(currentPhotoFile)}
+                          </span>
+                        </div>
+
+                        <p className="newListing__photo-instruction">
+                          {currentPhotoStep.instruction}
+                        </p>
+
+                        <input
+                          id={currentPhotoStep.key}
+                          className="newListing__input"
+                          type="file"
+                          name={currentPhotoStep.key}
+                          accept="image/*"
+                          onChange={handleRequiredPhotoChange}
+                        />
+
+                        {currentPhotoFile && (
+                          <>
+                            <div className="newListing__photo-preview-box">
+                              <img
+                                className="newListing__photo-preview"
+                                src={currentPhotoPreview}
+                                alt={currentPhotoStep.alt}
+                              />
+                            </div>
+
+                            <button
+                              type="button"
+                              className="newListing__btn newListing__btn--ghost"
+                              onClick={() =>
+                                handleRemoveRequiredPhoto(currentPhotoStep.key)
+                              }
+                            >
+                              Remover foto
+                            </button>
+                          </>
+                        )}
+
+               <div className="newListing__stepper-actions">
+  <button
+    type="button"
+    className="newListing__btn newListing__btn--ghost"
+    onClick={handlePrevPhotoStep}
+    disabled={activePhotoStep === 0}
+  >
+    Anterior
+  </button>
+
+  {allPhotosSent && activePhotoStep === PHOTO_STEPS.length - 1 ? (
+    <button
+      type="button"
+      className="newListing__btn newListing__stepper-complete-btn"
+    >
+      Concluir fotos
+    </button>
+  ) : (
+    <button
+      type="button"
+      className="newListing__btn"
+      onClick={handleNextPhotoStep}
+      disabled={activePhotoStep === PHOTO_STEPS.length - 1}
+    >
+      Próxima
+    </button>
+  )}
+</div>
+                      </div>
+
+                      {allPhotosSent && (
+                        <p className="newListing__stepper-complete">
+                          Todas as fotos obrigatórias foram enviadas.
+                        </p>
+                      )}
+                    </div>
                   </div>
                 </div>
 
