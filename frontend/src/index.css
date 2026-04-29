@@ -6,4 +6,5 @@
 @import "./blocks/CreateStore.css";
 @import "./blocks/StoreDashboard.css";
 @import "./blocks/Store.css";
-@import "./blocks/NewListining"
+@import "./blocks/NewListining";
+@import "./blocks/AdsList.css"

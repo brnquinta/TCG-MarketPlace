@@ -8,6 +8,9 @@ import CardDetail from './pages/CardDetail.jsx'
 import Checkout from './pages/Checkout.jsx'
 import CreateStore from './pages/CreateStore.jsx'
 import StoreDashboard from './pages/StoreDashboard.jsx'
+import AdsList from './pages/AdsList.jsx'
+
+
 
 function App() {
   return (
@@ -15,6 +18,7 @@ function App() {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/search" element={<Search />} />
+        <Route path="/anuncios" element={<AdsList />} />
         <Route path="/card/:id" element={<CardDetail />} />
         <Route path="/store/create" element={<CreateStore />} />
         <Route path="/store/:userId" element={<Store />} />

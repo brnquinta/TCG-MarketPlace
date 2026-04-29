@@ -11,6 +11,7 @@ function MainLayout({ children }) {
           </Link>
           <div className="main-layout__nav-links">
             <Link to="/search" className="main-layout__nav-link">Buscar cartas</Link>
+            <Link to="/anuncios" className="main-layout__nav-link">Anuncios</Link>
             <SignedIn>
               <Link to="/dashboard" className="main-layout__nav-link">Minha loja</Link>
               <Link to="/new-listing" className="main-layout__nav-link">Anunciar carta</Link>

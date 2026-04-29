@@ -772,34 +772,34 @@ function NewListing() {
                         )}
 
                <div className="newListing__stepper-actions">
-  <button
-    type="button"
-    className="newListing__btn newListing__btn--ghost"
-    onClick={handlePrevPhotoStep}
-    disabled={activePhotoStep === 0}
-  >
-    Anterior
-  </button>
-
-  {allPhotosSent && activePhotoStep === PHOTO_STEPS.length - 1 ? (
-    <button
-      type="button"
-      className="newListing__btn newListing__stepper-complete-btn"
-    >
-      Concluir fotos
-    </button>
-  ) : (
-    <button
-      type="button"
-      className="newListing__btn"
-      onClick={handleNextPhotoStep}
-      disabled={activePhotoStep === PHOTO_STEPS.length - 1}
-    >
-      Próxima
-    </button>
-  )}
-</div>
-                      </div>
+                  <button
+                    type="button"
+                    className="newListing__btn newListing__btn--ghost"
+                    onClick={handlePrevPhotoStep}
+                    disabled={activePhotoStep === 0}
+                  >
+                    Anterior
+                  </button>
+                                    
+                  {allPhotosSent && activePhotoStep === PHOTO_STEPS.length - 1 ? (
+                    <button
+                      type="button"
+                      className="newListing__btn newListing__stepper-complete-btn"
+                    >
+                      Concluir fotos
+                    </button>
+                  ) : (
+                    <button
+                      type="button"
+                      className="newListing__btn"
+                      onClick={handleNextPhotoStep}
+                      disabled={activePhotoStep === PHOTO_STEPS.length - 1}
+                    >
+                      Próxima
+                    </button>
+                  )}
+                </div>
+            </div>
 
                       {allPhotosSent && (
                         <p className="newListing__stepper-complete">

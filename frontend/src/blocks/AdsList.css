@@ -1,0 +1,196 @@
+.ads {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.ads__layout {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.ads__toolbar {
+  display: flex;
+  gap: 0.4rem;
+}
+
+.ads__view-btn {
+  padding: 5px 10px;
+  border: 1px solid #d1d5db;
+  background: #ffffff;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.8rem;
+  transition: all 0.2s ease;
+}
+
+.ads__view-btn:hover {
+  background: #f3f4f6;
+}
+
+.ads__view-btn--active {
+  background: #2563eb;
+  color: #ffffff;
+  border-color: #2563eb;
+}
+
+.ads__results-box {
+  padding: 1rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  background-color: #ffffff;
+}
+
+.ads__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+  gap: 1rem;
+}
+
+.ads__grid--list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.ads__grid--list .ads__card {
+  display: grid;
+  grid-template-columns: 80px 1fr 110px;
+  gap: 0.6rem;
+  align-items: center;
+  padding: 0.55rem 0.6rem;
+  border-radius: 10px;
+}
+
+.ads__grid--list .ads__image-box {
+  width: 80px;
+  height: 110px;
+}
+
+.ads__grid--list .ads__info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.ads__grid--list .ads__top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.ads__grid--list .ads__badges {
+  display: flex;
+  gap: 0.25rem;
+  flex-wrap: wrap;
+}
+
+.ads__grid--list .ads__store {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.75rem;
+}
+
+.ads__grid--list .ads__price {
+  justify-self: end;
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.ads__card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  text-decoration: none;
+  background-color: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 0.7rem;
+  transition: all 0.2s ease;
+}
+
+.ads__card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+}
+
+.ads__image {
+  width: 100%;
+  border-radius: 6px;
+  object-fit: cover;
+}
+
+.ads__info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.ads__title {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #111827;
+  margin: 0;
+  line-height: 1.2;
+}
+
+.ads__meta {
+  font-size: 0.75rem;
+  color: #6b7280;
+}
+
+.ads__price {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #2563eb;
+}
+
+.ads__location {
+  font-size: 0.7rem;
+  color: #9ca3af;
+}
+
+.ads__badge {
+  padding: 1px 5px;
+  font-size: 0.65rem;
+  border-radius: 5px;
+  background-color: #f3f4f6;
+  color: #374151;
+}
+
+.ads__divider {
+  width: 100%;
+  height: 1px;
+  background: linear-gradient(to right, transparent, #e5e7eb, transparent);
+  margin: 3px 0;
+}
+
+.ads__store-name {
+  font-weight: 500;
+}
+
+.ads__store-rating {
+  font-size: 0.7rem;
+  color: #6b7280;
+}
+
+@media (max-width: 768px) {
+  .ads__grid {
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 0.8rem;
+  }
+
+  .ads__results-box {
+    padding: 0.8rem;
+  }
+
+  .ads__grid--list .ads__card {
+    grid-template-columns: 65px 1fr;
+  }
+
+  .ads__grid--list .ads__price {
+    justify-self: start;
+  }
+}

@@ -15,6 +15,10 @@ function Home() {
             Buscar cartas
           </Link>
 
+          <Link to="/anuncios" className="home__btn home__btn--primary">
+            Anuncios
+          </Link>
+
           <SignedOut>
             <SignInButton mode="modal">
               <button type="button" className="home__btn home__btn--secondary">
