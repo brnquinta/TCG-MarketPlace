@@ -9,6 +9,7 @@ import Checkout from './pages/Checkout.jsx'
 import CreateStore from './pages/CreateStore.jsx'
 import StoreDashboard from './pages/StoreDashboard.jsx'
 import AdsList from './pages/AdsList.jsx'
+import ListingDetails from "./pages/ListingDetails"
 
 
 
@@ -24,6 +25,7 @@ function App() {
         <Route path="/store/:userId" element={<Store />} />
         <Route path="/dashboard" element={<StoreDashboard />} />
         <Route path="/new-listing" element={<NewListing />} />
+        <Route path="/listing/:id" element={<ListingDetails />} />
         <Route path="/checkout/:listingId" element={<Checkout />} />
       </Routes>
     </MainLayout>

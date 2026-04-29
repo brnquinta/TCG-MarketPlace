@@ -4,6 +4,7 @@ import useCardSearch from '../hooks/useCardSearch'
 import { CARD_CONDITION_FILTER_OPTIONS } from '../../utils/cardConditions'
 import { CARD_LANGUAGE_FILTER_OPTIONS } from '../../utils/cardLanguages'
 
+
 function Search() {
   const [showListingFilters, setShowListingFilters] = useState(false)
   const [listingFilters, setListingFilters] = useState({
