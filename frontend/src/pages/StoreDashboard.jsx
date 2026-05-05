@@ -1,27 +1,9 @@
 import { Link } from 'react-router-dom'
+import { useStore } from '../context/StoreContext'
+
 
 function StoreDashboard() {
-const store = {
-  name: 'Loja do Bruno TCG',
-  slug: 'loja-do-bruno-tcg',
-  description: 'Loja focada em cartas Pokémon para coleção e competitivo.',
-  location: {
-    city: 'Rio de Janeiro',
-    state: 'RJ',
-  },
-  status: 'draft',
-  onboardingStatus: 'pending',
-  rating: {
-    average: 4.8,
-    reviewsCount: 24,
-  },
-  stats: {
-    activeListings: 0,
-    totalSales: 0,
-    totalViews: 0,
-  },
-}
-
+  const { store } = useStore()
   const nextSteps = [
     {
       id: 1,
@@ -36,40 +18,38 @@ const store = {
       description: 'Preencha CPF/CNPJ, telefone, endereço e dados de repasse.',
       actionLabel: 'Fazer onboarding',
       actionPath: '/store/onboarding',
-    }
+    },
   ]
-
   const recentListings = []
-
   const getStoreStatusLabel = (status) => {
     if (status === 'active') return 'Ativa'
     if (status === 'draft') return 'Em configuração'
     return 'Indefinido'
   }
-
   const getOnboardingStatusLabel = (status) => {
     if (status === 'approved') return 'Aprovado'
     if (status === 'pending') return 'Pendente'
     return 'Não iniciado'
   }
-
   return (
     <section className="store-dashboard">
       <div className="store-dashboard__header">
         <div className="store-dashboard__header-content">
-            <p className="store-dashboard__eyebrow">Painel da loja</p>
-            <h1 className="store-dashboard__title">{store.name}</h1>
-            <p className="store-dashboard__subtitle">
+          <p className="store-dashboard__eyebrow">Painel da loja</p>
+          <h1 className="store-dashboard__title">{store.name}</h1>
+          <p className="store-dashboard__subtitle">
             Gerencie sua loja, acompanhe o status da conta e publique seus anúncios.
-            </p>
-
-            <div className="store-dashboard__rating">
-              <span className="store-dashboard__rating-star">★</span>
-              <span className="store-dashboard__rating-value">4.8</span>
-              <span className="store-dashboard__rating-count">(24 reviews)</span>
-            </div>
+          </p>
+          <div className="store-dashboard__rating">
+            <span className="store-dashboard__rating-star">★</span>
+            <span className="store-dashboard__rating-value">
+              {store.rating.average}
+            </span>
+            <span className="store-dashboard__rating-count">
+              ({store.rating.reviewsCount} reviews)
+            </span>
+          </div>
         </div>
-
         <div className="store-dashboard__header-actions">
           <Link
             to={`/store/${store.slug}`}
@@ -77,7 +57,6 @@ const store = {
           >
             Ver loja pública
           </Link>
-
           <Link
             to="/new-listing"
             className="store-dashboard__button store-dashboard__button--primary"
@@ -86,45 +65,48 @@ const store = {
           </Link>
         </div>
       </div>
-
       <div className="store-dashboard__layout">
         <aside className="store-dashboard__sidebar">
           <div className="store-dashboard__card">
             <h2 className="store-dashboard__card-title">Resumo da loja</h2>
-
             <ul className="store-dashboard__details">
               <li className="store-dashboard__detail-item">
                 <span className="store-dashboard__detail-label">Nome</span>
-                <span className="store-dashboard__detail-value">{store.name}</span>
+                <span className="store-dashboard__detail-value">
+                  {store.name}
+                </span>
               </li>
-
               <li className="store-dashboard__detail-item">
                 <span className="store-dashboard__detail-label">Slug</span>
-                <span className="store-dashboard__detail-value">@{store.slug}</span>
+                <span className="store-dashboard__detail-value">
+                  @{store.slug}
+                </span>
               </li>
-
               <li className="store-dashboard__detail-item">
-                <span className="store-dashboard__detail-label">Localização</span>
+                <span className="store-dashboard__detail-label">
+                  Localização
+                </span>
                 <span className="store-dashboard__detail-value">
                   {store.location.city} - {store.location.state}
                 </span>
               </li>
-
               <li className="store-dashboard__detail-item">
-                <span className="store-dashboard__detail-label">Status da loja</span>
+                <span className="store-dashboard__detail-label">
+                  Status da loja
+                </span>
                 <span className="store-dashboard__detail-value">
                   {getStoreStatusLabel(store.status)}
                 </span>
               </li>
-
               <li className="store-dashboard__detail-item">
-                <span className="store-dashboard__detail-label">Onboarding</span>
+                <span className="store-dashboard__detail-label">
+                  Onboarding
+                </span>
                 <span className="store-dashboard__detail-value">
                   {getOnboardingStatusLabel(store.onboardingStatus)}
                 </span>
               </li>
             </ul>
-
             <Link
               to="/store/edit"
               className="store-dashboard__link-button"
@@ -132,42 +114,40 @@ const store = {
               Editar informações da loja
             </Link>
           </div>
-
           <div className="store-dashboard__card">
             <h2 className="store-dashboard__card-title">Sobre a loja</h2>
             <p className="store-dashboard__description">{store.description}</p>
           </div>
         </aside>
-
         <div className="store-dashboard__main">
           <div className="store-dashboard__stats">
             <article className="store-dashboard__stat-card">
               <span className="store-dashboard__stat-value">
                 {store.stats.activeListings}
               </span>
-              <span className="store-dashboard__stat-label">Anúncios ativos</span>
+              <span className="store-dashboard__stat-label">
+                Anúncios ativos
+              </span>
             </article>
-
             <article className="store-dashboard__stat-card">
               <span className="store-dashboard__stat-value">
                 {store.stats.totalSales}
               </span>
               <span className="store-dashboard__stat-label">Vendas</span>
             </article>
-
             <article className="store-dashboard__stat-card">
               <span className="store-dashboard__stat-value">
                 {store.stats.totalViews}
               </span>
-              <span className="store-dashboard__stat-label">Visualizações</span>
+              <span className="store-dashboard__stat-label">
+                Visualizações
+              </span>
             </article>
           </div>
-
           <div className="store-dashboard__card">
             <div className="store-dashboard__section-header">
               <h2 className="store-dashboard__card-title">Próximos passos</h2>
             </div>
-
             <div className="store-dashboard__steps">
               {nextSteps.map((step) => (
                 <article key={step.id} className="store-dashboard__step">
@@ -177,7 +157,6 @@ const store = {
                       {step.description}
                     </p>
                   </div>
-
                   <Link
                     to={step.actionPath}
                     className="store-dashboard__step-button"
@@ -188,7 +167,6 @@ const store = {
               ))}
             </div>
           </div>
-
           <div className="store-dashboard__card">
             <div className="store-dashboard__section-header">
               <h2 className="store-dashboard__card-title">Meus anúncios</h2>
@@ -199,7 +177,6 @@ const store = {
                 Criar anúncio
               </Link>
             </div>
-
             {recentListings.length > 0 ? (
               <div className="store-dashboard__listings">
                 {recentListings.map((listing) => (
@@ -217,7 +194,8 @@ const store = {
                   Você ainda não publicou nenhuma carta
                 </h3>
                 <p className="store-dashboard__empty-text">
-                  Crie seu primeiro anúncio para começar a montar a vitrine da sua loja.
+                  Crie seu primeiro anúncio para começar a montar a vitrine da
+                  sua loja.
                 </p>
                 <Link
                   to="/new-listing"
@@ -233,5 +211,4 @@ const store = {
     </section>
   )
 }
-
 export default StoreDashboard

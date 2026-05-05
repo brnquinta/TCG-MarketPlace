@@ -3,6 +3,7 @@ import MainLayout from './layouts/MainLayout.jsx'
 import Home from './pages/Home.jsx'
 import Search from './pages/Search.jsx'
 import Store from './pages/Store.jsx'
+import StoreEdit from './pages/StoreEdit.jsx'
 import NewListing from './pages/NewListing.jsx'
 import CardDetail from './pages/CardDetail.jsx'
 import Checkout from './pages/Checkout.jsx'
@@ -22,6 +23,7 @@ function App() {
         <Route path="/anuncios" element={<AdsList />} />
         <Route path="/card/:id" element={<CardDetail />} />
         <Route path="/store/create" element={<CreateStore />} />
+        <Route path="/store/edit" element={<StoreEdit />} />
         <Route path="/store/:userId" element={<Store />} />
         <Route path="/dashboard" element={<StoreDashboard />} />
         <Route path="/new-listing" element={<NewListing />} />
