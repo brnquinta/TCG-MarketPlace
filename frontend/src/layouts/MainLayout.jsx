@@ -15,6 +15,9 @@ function MainLayout({ children }) {
             <SignedIn>
               <Link to="/dashboard" className="main-layout__nav-link">Minha loja</Link>
               <Link to="/new-listing" className="main-layout__nav-link">Anunciar carta</Link>
+              <Link to="/cart" className="main-layout__nav-link">
+  Carrinho
+</Link>
               <UserButton />
             </SignedIn>
             <SignedOut>

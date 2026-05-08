@@ -1,9 +1,14 @@
 import { Link } from 'react-router-dom'
 import { SignedIn, SignedOut, SignInButton } from '@clerk/clerk-react'
+import { useUser } from "@clerk/clerk-react";
+
 
 function Home() {
+  const { user } = useUser();
+   {{console.log(user?.id)}}
   return (
-    <div className="home">
+
+  <div className="home">
       <section className="home__hero">
         <h1 className="home__title">O marketplace de cartas Pokémon TCG do Brasil</h1>
         <p className="home__subtitle">
@@ -32,6 +37,20 @@ function Home() {
               Criar minha loja
             </Link>
           </SignedIn>
+          
+        
+
+          <SignedIn>
+          <SignedIn>
+            <Link
+              to={`/cart/${user?.id}`}
+               className="home__btn home__btn--secondary"
+              >
+          Carrinho
+         </Link>
+           </SignedIn>
+          </SignedIn>
+          
         </div>
       </section>
 

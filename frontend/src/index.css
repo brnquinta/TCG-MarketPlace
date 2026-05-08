@@ -9,4 +9,5 @@
 @import "./blocks/NewListining";
 @import "./blocks/AdsList.css";
 @import "./blocks/ListingDetails.css";
-@import "./blocks/EditStore.css"
+@import "./blocks/EditStore.css";
+@import "./blocks/Cart.css"
