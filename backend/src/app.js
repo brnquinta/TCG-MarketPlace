@@ -8,6 +8,9 @@ import connectDB from './config/db.js'
 import authRoutes from './routes/authRoutes.js'
 import storeRoutes from './routes/storeRoutes.js'
 import listingRoutes from './routes/listingRoutes.js'
+import webhookRoutes from './routes/webhookRoutes.js'
+import cartRoutes from './routes/cartRoutes.js'
+import debugRoutes from './routes/debugRoutes.js'
 import { authenticateToken, optionalAuth } from './middleware/auth.js'
 
 dotenv.config()
@@ -30,6 +33,9 @@ app.get('/api/health', (req, res) => {
 app.use('/api/auth', authRoutes)
 app.use('/api/stores', optionalAuth, storeRoutes)
 app.use('/api/listings', optionalAuth, listingRoutes)
+app.use('/api/webhooks', webhookRoutes)
+app.use('/api/cart', authenticateToken, cartRoutes)
+app.use('/api/debug', debugRoutes)
 
 app.use((err, req, res, next) => {
   console.error(err.stack)
