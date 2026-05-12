@@ -41,7 +41,7 @@ function Cart() {
                 <div className="cart-store-info">
                   <span className="cart-store-badge">Loja</span>
                   <span className="cart-store-info-text">
-                    <strong>{group.store.name}</strong> • ⭐ {group.store.rating}
+                    <strong>{group.store.name}</strong> • ⭐ {group.store.rating || '0'}
                   </span>
                 </div>
                 <span style={{ fontSize: '0.8rem', color: '#6b7280' }}>

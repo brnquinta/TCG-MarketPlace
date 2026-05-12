@@ -1,61 +1,49 @@
 import { useParams } from "react-router-dom"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useCart } from "../context/CartContext"
 
-const listings = [
-  {
-    id: "1",
-    cardSnapshot: {
-      name: "Charizard",
-      number: "4",
-      rarity: "Rare Holo",
-      imageLarge: "https://images.pokemontcg.io/base1/4_hires.png",
-      setName: "Base Set",
-    },
-    listingData: {
-      price: 199.9,
-      condition: "NM",
-      language: "EN",
-      quantity: 2,
-      certified: true,
-      gradingCompany: "PSA",
-      grade: "10",
-      acceptsOffer: true,
-      description: "Carta em perfeito estado, sem marcas visíveis.",
-      defects: "Nenhum defeito relevante.",
-      city: "Rio de Janeiro",
-      state: "RJ",
-      shippingAvailable: true,
-      localPickup: true,
-      photos: {
-        front90: "https://images.pokemontcg.io/base1/4.png",
-        back90: "https://images.pokemontcg.io/base1/4.png",
-        front45: "https://images.pokemontcg.io/base1/4.png",
-        back45: "https://images.pokemontcg.io/base1/4.png",
-      },
-    },
-    store: {
-      id: "store-1",
-      name: "Bruno TCG",
-      rating: 4.8,
-    },
-  },
-]
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api'
 
 function ListingDetails() {
   const { id } = useParams()
-  const { addToCart } = useCart()
+  const { addToCart, error: cartError } = useCart()
 
-  const listing = listings.find((item) => item.id === id)
-
+  const [listing, setListing] = useState(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
   const [currentPhoto, setCurrentPhoto] = useState(0)
   const [addedToCart, setAddedToCart] = useState(false)
 
-  if (!listing) return <p>Anúncio não encontrado</p>
+  useEffect(() => {
+    async function fetchListing() {
+      try {
+        const response = await fetch(`${API_URL}/listings/${id}`)
+        if (!response.ok) {
+          throw new Error('Anuncio nao encontrado')
+        }
+        const data = await response.json()
+        setListing(data)
+      } catch (err) {
+        setError(err.message)
+      } finally {
+        setLoading(false)
+      }
+    }
 
-  const { cardSnapshot, listingData, store } = listing
+    if (id) {
+      fetchListing()
+    }
+  }, [id])
 
-  const photosArray = Object.values(listingData.photos)
+  if (loading) return <p>Carregando...</p>
+  if (error) return <p>Erro: {error}</p>
+  if (!listing) return <p>Anuncio nao encontrado</p>
+
+  const cardSnapshot = listing.cardSnapshot
+  const listingData = listing.listingData
+  const store = listing.storeId
+
+  const photosArray = listing.photos ? Object.values(listing.photos).filter(Boolean) : []
 
   const nextPhoto = () => {
     setCurrentPhoto((prev) =>
@@ -69,13 +57,17 @@ function ListingDetails() {
     )
   }
 
-  const handleAddToCart = () => {
-    addToCart(listing)
-    setAddedToCart(true)
+  const handleAddToCart = async () => {
+    try {
+      await addToCart({ id: listing._id })
+      setAddedToCart(true)
 
-    setTimeout(() => {
-      setAddedToCart(false)
-    }, 4000)
+      setTimeout(() => {
+        setAddedToCart(false)
+      }, 4000)
+    } catch (err) {
+      console.error('Erro ao adicionar:', err)
+    }
   }
 
   return (
@@ -111,7 +103,7 @@ function ListingDetails() {
           </h2>
 
           <div className="listing-details__details">
-            <p>Condição: {listingData.condition}</p>
+            <p>Condicao: {listingData.condition}</p>
             <p>Idioma: {listingData.language}</p>
             <p>Quantidade: {listingData.quantity}</p>
           </div>
@@ -129,6 +121,12 @@ function ListingDetails() {
             </span>
           )}
 
+          {cartError && (
+            <span className="listing-details__error" style={{ color: 'red' }}>
+              {cartError}
+            </span>
+          )}
+
           {listingData.certified && (
             <div className="listing-details__certified">
               {listingData.gradingCompany} {listingData.grade}
@@ -142,66 +140,72 @@ function ListingDetails() {
           )}
 
           <p className="listing-details__location">
-            📍 {listingData.city} - {listingData.state}
+            {listingData.city} - {listingData.state}
           </p>
 
         </div>
       </div>
 
       {/* ===== CAROUSEL ===== */}
-      <div className="listing-details__section">
+      {photosArray.length > 0 && (
+        <div className="listing-details__section">
 
-        <div className="listing-details__section-header">
-          <h3>Fotos do item</h3>
+          <div className="listing-details__section-header">
+            <h3>Fotos do item</h3>
+          </div>
+
+          <div className="listing-details__carousel">
+
+            <button
+              className="listing-details__carousel-btn"
+              onClick={prevPhoto}
+              disabled={currentPhoto === 0}
+            >
+              ←
+            </button>
+
+            <img
+              src={photosArray[currentPhoto]}
+              className="listing-details__carousel-image"
+            />
+
+            <button
+              className="listing-details__carousel-btn"
+              onClick={nextPhoto}
+              disabled={currentPhoto === photosArray.length - 1}
+            >
+              →
+            </button>
+          </div>
+
+          <p className="listing-details__carousel-counter">
+            {currentPhoto + 1} / {photosArray.length}
+          </p>
         </div>
-
-        <div className="listing-details__carousel">
-
-          <button
-            className="listing-details__carousel-btn"
-            onClick={prevPhoto}
-            disabled={currentPhoto === 0}
-          >
-            ←
-          </button>
-
-          <img
-            src={photosArray[currentPhoto]}
-            className="listing-details__carousel-image"
-          />
-
-          <button
-            className="listing-details__carousel-btn"
-            onClick={nextPhoto}
-            disabled={currentPhoto === photosArray.length - 1}
-          >
-            →
-          </button>
-        </div>
-
-        <p className="listing-details__carousel-counter">
-          {currentPhoto + 1} / {photosArray.length}
-        </p>
-      </div>
+      )}
 
       {/* ===== DESCRIÇÃO ===== */}
       <div className="listing-details__section">
 
         <div className="listing-details__section-header">
-          <h3>Descrição</h3>
+          <h3>Descricao</h3>
         </div>
 
         <p className="listing-details__text">
-          {listingData.description}
+          {listingData.description || 'Sem descricao'}
         </p>
 
-        <h4 className="listing-details__subtitle">
-          Defeitos
-        </h4>
+        {listingData.defects && (
+          <>
+            <h4 className="listing-details__subtitle">
+              Defeitos
+            </h4>
 
-        <p className="listing-details__text">
-          {listingData.defects}
-        </p>
+            <p className="listing-details__text">
+              {listingData.defects}
+            </p>
+          </>
+        )}
 
       </div>
 
@@ -215,30 +219,32 @@ function ListingDetails() {
         <div className="listing-details__shipping">
           {listingData.shippingAvailable && (
             <div className="listing-details__shipping-item">
-              Envio disponível
+              Envio disponivel
             </div>
           )}
 
           {listingData.localPickup && (
             <div className="listing-details__shipping-item">
-              Retirada em mãos
+              Retirada em maos
             </div>
           )}
         </div>
       </div>
 
       {/* ===== LOJA ===== */}
-      <div className="listing-details__store">
+      {store && (
+        <div className="listing-details__store">
 
-        <p className="listing-details__store-name">
-          Vendido por <strong>{store.name}</strong>
-        </p>
+          <p className="listing-details__store-name">
+            Vendido por <strong>{store.name}</strong>
+          </p>
 
-        <p className="listing-details__store-rating">
-          ⭐ {store.rating}
-        </p>
+          <p className="listing-details__store-rating">
+            {store.rating ? `Nota: ${store.rating}` : 'Sem avaliacao'}
+          </p>
 
-      </div>
+        </div>
+      )}
     </div>
   )
 }
