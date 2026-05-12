@@ -1,5 +1,6 @@
 import { useParams } from "react-router-dom"
 import { useState } from "react"
+import { useCart } from "../context/CartContext"
 
 const listings = [
   {
@@ -34,6 +35,7 @@ const listings = [
       },
     },
     store: {
+      id: "store-1",
       name: "Bruno TCG",
       rating: 4.8,
     },
@@ -42,15 +44,18 @@ const listings = [
 
 function ListingDetails() {
   const { id } = useParams()
+  const { addToCart } = useCart()
+
   const listing = listings.find((item) => item.id === id)
+
+  const [currentPhoto, setCurrentPhoto] = useState(0)
+  const [addedToCart, setAddedToCart] = useState(false)
 
   if (!listing) return <p>Anúncio não encontrado</p>
 
   const { cardSnapshot, listingData, store } = listing
 
   const photosArray = Object.values(listingData.photos)
-
-  const [currentPhoto, setCurrentPhoto] = useState(0)
 
   const nextPhoto = () => {
     setCurrentPhoto((prev) =>
@@ -64,55 +69,96 @@ function ListingDetails() {
     )
   }
 
+  const handleAddToCart = () => {
+    addToCart(listing)
+    setAddedToCart(true)
+
+    setTimeout(() => {
+      setAddedToCart(false)
+    }, 4000)
+  }
+
   return (
-    <div className="listingDetails">
+    <div className="listing-details">
 
       {/* ===== TOPO ===== */}
-      <div className="listingDetails__top">
+      <div className="listing-details__top">
 
-        <div className="listingDetails__gallery">
+        <div className="listing-details__gallery">
           <img
             src={cardSnapshot.imageLarge}
             alt={cardSnapshot.name}
-            className="listingDetails__main-image"
+            className="listing-details__main-image"
           />
         </div>
 
-        <div className="listingDetails__info">
-          <h1>{cardSnapshot.name}</h1>
+        <div className="listing-details__info">
 
-          <p>
-            {cardSnapshot.setName} • #{cardSnapshot.number} • {cardSnapshot.rarity}
+          <div className="listing-details__badge">
+            {cardSnapshot.setName}
+          </div>
+
+          <h1 className="listing-details__title">
+            {cardSnapshot.name}
+          </h1>
+
+          <p className="listing-details__meta">
+            #{cardSnapshot.number} • {cardSnapshot.rarity}
           </p>
 
-          <h2>R$ {listingData.price.toFixed(2)}</h2>
+          <h2 className="listing-details__price">
+            R$ {listingData.price.toFixed(2)}
+          </h2>
 
-          <p>Condição: {listingData.condition}</p>
-          <p>Idioma: {listingData.language}</p>
-          <p>Quantidade: {listingData.quantity}</p>
+          <div className="listing-details__details">
+            <p>Condição: {listingData.condition}</p>
+            <p>Idioma: {listingData.language}</p>
+            <p>Quantidade: {listingData.quantity}</p>
+          </div>
 
-          {listingData.certified && (
-            <p>
-              {listingData.gradingCompany} {listingData.grade}
-            </p>
+          <button
+            className="listing-details__cart-button"
+            onClick={handleAddToCart}
+          >
+            Adicionar ao carrinho
+          </button>
+
+          {addedToCart && (
+            <span className="listing-details__success">
+              Adicionado ao carrinho, visite o carrinho para concluir a compra.
+            </span>
           )}
 
-          {listingData.acceptsOffer && <p>Aceita ofertas</p>}
+          {listingData.certified && (
+            <div className="listing-details__certified">
+              {listingData.gradingCompany} {listingData.grade}
+            </div>
+          )}
 
-          <p>
+          {listingData.acceptsOffer && (
+            <div className="listing-details__offer">
+              Aceita ofertas
+            </div>
+          )}
+
+          <p className="listing-details__location">
             📍 {listingData.city} - {listingData.state}
           </p>
+
         </div>
       </div>
 
-      {/* ===== CAROUSEL DE FOTOS ===== */}
-      <div className="listingDetails__section">
-        <h3>Fotos do item</h3>
+      {/* ===== CAROUSEL ===== */}
+      <div className="listing-details__section">
 
-        <div className="listingDetails__carousel">
+        <div className="listing-details__section-header">
+          <h3>Fotos do item</h3>
+        </div>
+
+        <div className="listing-details__carousel">
 
           <button
-            className="listingDetails__carousel-btn"
+            className="listing-details__carousel-btn"
             onClick={prevPhoto}
             disabled={currentPhoto === 0}
           >
@@ -121,11 +167,11 @@ function ListingDetails() {
 
           <img
             src={photosArray[currentPhoto]}
-            className="listingDetails__carousel-image"
+            className="listing-details__carousel-image"
           />
 
           <button
-            className="listingDetails__carousel-btn"
+            className="listing-details__carousel-btn"
             onClick={nextPhoto}
             disabled={currentPhoto === photosArray.length - 1}
           >
@@ -133,34 +179,65 @@ function ListingDetails() {
           </button>
         </div>
 
-        <p className="listingDetails__carousel-counter">
+        <p className="listing-details__carousel-counter">
           {currentPhoto + 1} / {photosArray.length}
         </p>
       </div>
 
       {/* ===== DESCRIÇÃO ===== */}
-      <div className="listingDetails__section">
-        <h3>Descrição</h3>
-        <p>{listingData.description}</p>
+      <div className="listing-details__section">
 
-        <h4>Defeitos</h4>
-        <p>{listingData.defects}</p>
+        <div className="listing-details__section-header">
+          <h3>Descrição</h3>
+        </div>
+
+        <p className="listing-details__text">
+          {listingData.description}
+        </p>
+
+        <h4 className="listing-details__subtitle">
+          Defeitos
+        </h4>
+
+        <p className="listing-details__text">
+          {listingData.defects}
+        </p>
+
       </div>
 
       {/* ===== ENTREGA ===== */}
-      <div className="listingDetails__section">
-        <h3>Entrega</h3>
+      <div className="listing-details__section">
 
-        {listingData.shippingAvailable && <p>Envio disponível</p>}
-        {listingData.localPickup && <p>Retirada em mãos</p>}
+        <div className="listing-details__section-header">
+          <h3>Entrega</h3>
+        </div>
+
+        <div className="listing-details__shipping">
+          {listingData.shippingAvailable && (
+            <div className="listing-details__shipping-item">
+              Envio disponível
+            </div>
+          )}
+
+          {listingData.localPickup && (
+            <div className="listing-details__shipping-item">
+              Retirada em mãos
+            </div>
+          )}
+        </div>
       </div>
 
       {/* ===== LOJA ===== */}
-      <div className="listingDetails__store">
-        <p>
+      <div className="listing-details__store">
+
+        <p className="listing-details__store-name">
           Vendido por <strong>{store.name}</strong>
         </p>
-        <p>⭐ {store.rating}</p>
+
+        <p className="listing-details__store-rating">
+          ⭐ {store.rating}
+        </p>
+
       </div>
     </div>
   )
