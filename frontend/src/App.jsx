@@ -1,4 +1,5 @@
-import { Routes, Route } from 'react-router-dom'
+import { Routes, Route, Navigate } from 'react-router-dom'
+import { useStore } from './context/StoreContext.jsx'
 import MainLayout from './layouts/MainLayout.jsx'
 import Home from './pages/Home.jsx'
 import Search from './pages/Search.jsx'
@@ -13,7 +14,23 @@ import AdsList from './pages/AdsList.jsx'
 import ListingDetails from "./pages/ListingDetails"
 import Cart from "./pages/Cart.jsx"
 
+function ProtectedDashboard() {
+  const { store, loading } = useStore()
 
+  if (loading) {
+    return (
+      <div style={{ padding: '2rem', textAlign: 'center' }}>
+        Carregando...
+      </div>
+    )
+  }
+
+  if (!store) {
+    return <Navigate to="/store/create" replace />
+  }
+
+  return <StoreDashboard />
+}
 
 function App() {
   return (
@@ -26,7 +43,7 @@ function App() {
         <Route path="/store/create" element={<CreateStore />} />
         <Route path="/store/edit" element={<StoreEdit />} />
         <Route path="/store/:userId" element={<Store />} />
-        <Route path="/dashboard" element={<StoreDashboard />} />
+        <Route path="/dashboard" element={<ProtectedDashboard />} />
         <Route path="/new-listing" element={<NewListing />} />
         <Route path="/listing/:id" element={<ListingDetails />} />
         <Route path="/checkout/:listingId" element={<Checkout />} />

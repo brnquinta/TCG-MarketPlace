@@ -3,7 +3,23 @@ import { useStore } from '../context/StoreContext'
 
 
 function StoreDashboard() {
-  const { store } = useStore()
+  const { store, loading } = useStore()
+
+  if (loading) {
+    return (
+      <section className="store-dashboard">
+        <p>Carregando...</p>
+      </section>
+    )
+  }
+
+  if (!store) {
+    return (
+      <section className="store-dashboard">
+        <p>Loja nao encontrada</p>
+      </section>
+    )
+  }
   const nextSteps = [
     {
       id: 1,

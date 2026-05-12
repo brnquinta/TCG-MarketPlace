@@ -1,11 +1,16 @@
 import { Link } from 'react-router-dom'
 import { SignedIn, SignedOut, SignInButton } from '@clerk/clerk-react'
 import { useUser } from "@clerk/clerk-react";
+import { useStore } from "../context/StoreContext";
 
 
 function Home() {
   const { user } = useUser();
-   {{console.log(user?.id)}}
+  const { hasStore, loading: storeLoading } = useStore();
+
+  const storeLink = !storeLoading && hasStore ? "/dashboard" : "/store/create";
+  const storeText = !storeLoading && hasStore ? "Minha Loja" : "Criar minha loja";
+
   return (
 
   <div className="home">
@@ -33,8 +38,8 @@ function Home() {
           </SignedOut>
 
           <SignedIn>
-            <Link to="/store/create" className="home__btn home__btn--secondary">
-              Criar minha loja
+            <Link to={storeLink} className="home__btn home__btn--secondary">
+              {storeText}
             </Link>
           </SignedIn>
           

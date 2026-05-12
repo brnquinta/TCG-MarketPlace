@@ -20,6 +20,11 @@ export const createStore = async (req, res) => {
       return res.status(404).json({ error: 'User not found' })
     }
 
+    const existingUserStore = await Store.findOne({ userId: user._id })
+    if (existingUserStore) {
+      return res.status(400).json({ error: 'Voce ja possui uma loja' })
+    }
+
     const store = new Store({
       userId: user._id,
       name,

@@ -16,7 +16,6 @@ async function fetchCartAPI(token) {
     if (!response.ok) throw new Error('Failed to fetch cart')
     return await response.json()
   } catch (error) {
-    console.error('Error fetching cart:', error)
     return { items: [], total: 0 }
   }
 }
@@ -37,7 +36,6 @@ async function addItemAPI(token, listingId) {
     }
     return await response.json()
   } catch (error) {
-    console.error('Error adding item:', error)
     throw error
   }
 }
@@ -53,7 +51,6 @@ async function removeItemAPI(token, listingId) {
     if (!response.ok) throw new Error('Failed to remove item')
     return await response.json()
   } catch (error) {
-    console.error('Error removing item:', error)
     throw error
   }
 }
@@ -69,7 +66,6 @@ async function clearCartAPI(token) {
     if (!response.ok) throw new Error('Failed to clear cart')
     return await response.json()
   } catch (error) {
-    console.error('Error clearing cart:', error)
     throw error
   }
 }
@@ -81,8 +77,6 @@ function useClerkToken() {
 
   useEffect(() => {
     async function getToken() {
-      console.log('useClerkToken - isLoaded:', isLoaded, 'user:', user ? 'sim' : 'nao')
-      
       if (!isLoaded || !user) {
         setToken(null)
         setLoading(false)
@@ -90,22 +84,15 @@ function useClerkToken() {
       }
 
       try {
-        console.log('window.Clerk:', window.Clerk ? 'existe' : 'nao')
-        
         if (window.Clerk?.session) {
-          console.log('Tentando getToken via Clerk.session')
           const t = await window.Clerk.session.getToken()
-          console.log('Token obtido:', t ? 'sim' : 'nao')
           setToken(t)
         } else {
-          console.log('Procurando no localStorage...')
           const keys = Object.keys(localStorage)
-          console.log('Keys:', keys)
           
           for (const key of keys) {
             if (key.includes('clerk') || key.includes('jwt') || key.includes('db')) {
               const t = localStorage.getItem(key)
-              console.log(`Key ${key}:`, t ? `sim (${t.substring(0, 30)}...)` : 'nao')
               if (t && t.length > 50 && t.includes('.')) {
                 setToken(t)
                 break
@@ -114,7 +101,6 @@ function useClerkToken() {
           }
         }
       } catch (e) {
-        console.log('Erro ao buscar token:', e)
       } finally {
         setLoading(false)
       }
@@ -122,8 +108,6 @@ function useClerkToken() {
 
     getToken()
   }, [user, isLoaded])
-
-  console.log('useClerkToken retornando:', token ? 'tem token' : 'sem token', 'loading:', loading)
   
   return { token, loading }
 }
@@ -144,21 +128,16 @@ export function CartProvider({ children }) {
     prevTokenRef.current = token
     
     async function loadCart() {
-      console.log('loadCart - userLoaded:', userLoaded, 'tokenLoading:', tokenLoading, 'user:', user ? 'sim' : 'nao', 'token:', token ? 'sim' : 'nao')
-
       if (!userLoaded || tokenLoading) {
-        console.log('Aguardando...')
         return
       }
 
       if (!user) {
-        console.log('Usuario nao logado')
         setLoading(false)
         return
       }
 
       if (!token) {
-        console.log('Token nao disponivel ainda, tentando novamente...')
         await new Promise(r => setTimeout(r, 500))
         if (!window.Clerk?.session) {
           setLoading(false)
@@ -176,7 +155,6 @@ export function CartProvider({ children }) {
           setLoading(false)
           return
         } catch (e) {
-          console.log('Erro ao obter token:', e)
           setLoading(false)
           return
         }
@@ -187,7 +165,6 @@ export function CartProvider({ children }) {
         setCartItems(data.items || [])
         setCartTotal(data.total || 0)
       } catch (err) {
-        console.error('Error loading cart:', err)
       } finally {
         setLoading(false)
       }
@@ -233,7 +210,6 @@ export function CartProvider({ children }) {
       setCartItems(data.items || [])
       setCartTotal(data.total || 0)
     } catch (err) {
-      console.error('Error removing from cart:', err)
     }
   }, [user, token])
 
@@ -245,7 +221,6 @@ export function CartProvider({ children }) {
       setCartItems([])
       setCartTotal(0)
     } catch (err) {
-      console.error('Error clearing cart:', err)
     }
   }, [user, token])
 
@@ -258,7 +233,6 @@ export function CartProvider({ children }) {
 
   const getItemsByStore = () => {
     const grouped = {}
-    console.log('getItemsByStore - cartItems:', JSON.stringify(cartItems, null, 2))
     
     cartItems.forEach((item) => {
       const listing = item.listingId
@@ -266,8 +240,6 @@ export function CartProvider({ children }) {
       
       const store = listing.storeId
       if (!store) return
-      
-      console.log('Store:', JSON.stringify(store, null, 2))
       
       const storeId = store._id || store.id
       let storeRating = 0

@@ -1,28 +1,14 @@
-import { createContext, useContext, useState } from 'react'
+import { createContext, useContext, useState, useEffect } from 'react'
+import { useUser } from '@clerk/clerk-react'
+
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api'
+
 const StoreContext = createContext(null)
+
 export function StoreProvider({ children }) {
-  const [store, setStore] = useState({
-    name: 'Loja do Bruno TCG',
-    slug: 'loja-do-bruno-tcg',
-    logoUrl: '',
-    bannerUrl: '',
-    description: 'Loja focada em cartas Pokémon para coleção e competitivo.',
-    location: {
-      city: 'Rio de Janeiro',
-      state: 'RJ',
-    },
-    status: 'draft',
-    onboardingStatus: 'pending',
-    rating: {
-      average: 4.8,
-      reviewsCount: 24,
-    },
-    stats: {
-      activeListings: 0,
-      totalSales: 0,
-      totalViews: 0,
-    },
-  })
+  const { user, isLoaded } = useUser()
+  const [store, setStore] = useState(null)
+  const [loading, setLoading] = useState(true)
   const [listingFilters, setListingFilters] = useState({
     condition: '',
     priceMin: '',
@@ -30,19 +16,69 @@ export function StoreProvider({ children }) {
     certified: '',
     language: '',
   })
+
+  useEffect(() => {
+    let isMounted = true
+
+    async function fetchStore() {
+      if (!isLoaded || !user || !user.id) {
+        if (isMounted) {
+          setStore(null)
+          setLoading(false)
+        }
+        return
+      }
+
+      try {
+        const token = await window.Clerk?.session?.getToken()
+        if (!token) {
+          if (isMounted) setLoading(false)
+          return
+        }
+
+        const response = await fetch(`${API_URL}/stores/me`, {
+          headers: { Authorization: `Bearer ${token}` }
+        })
+
+        if (!isMounted) return
+
+        if (response.ok) {
+          const data = await response.json()
+          setStore(data)
+        } else {
+          setStore(null)
+        }
+      } catch (err) {
+        if (isMounted) setStore(null)
+      } finally {
+        if (isMounted) setLoading(false)
+      }
+    }
+
+    fetchStore()
+
+    return () => {
+      isMounted = false
+    }
+  }, [user, isLoaded])
+
   const updateStore = (updates) => {
-    setStore((prev) => ({ ...prev, ...updates }))
+    setStore((prev) => prev ? { ...prev, ...updates } : null)
   }
+
   const updateLocation = (updates) => {
-    setStore((prev) => ({
+    setStore((prev) => prev ? {
       ...prev,
-      location: { ...prev.location, ...updates },
-    }))
+      location: { ...prev.location, ...updates }
+    } : null)
   }
+
   return (
     <StoreContext.Provider
       value={{
         store,
+        loading,
+        hasStore: !!store,
         updateStore,
         updateLocation,
         listingFilters,
@@ -53,6 +89,7 @@ export function StoreProvider({ children }) {
     </StoreContext.Provider>
   )
 }
+
 export function useStore() {
   const context = useContext(StoreContext)
   if (!context) {

@@ -1,10 +1,21 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, Navigate } from 'react-router-dom'
+import { useStore } from '../context/StoreContext'
 import { brazilStates } from '../../utils/brazilianStates.js'
 
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api'
 
 function CreateStore() {
   const navigate = useNavigate()
+  const { store, loading: storeLoading } = useStore()
+
+  if (storeLoading) {
+    return <div>Carregando...</div>
+  }
+
+  if (store) {
+    return <Navigate to="/dashboard" replace />
+  }
 
   const [storeName, setStoreName] = useState('')
   const [storeSlug, setStoreSlug] = useState('')
@@ -14,6 +25,9 @@ function CreateStore() {
   const [storeState, setStoreState] = useState('')
 
   const [slugTouched, setSlugTouched] = useState(false)
+
+  const [submitting, setSubmitting] = useState(false)
+  const [error, setError] = useState(null)
 
   const slugify = (value) => {
     return value
@@ -40,24 +54,54 @@ function CreateStore() {
     setStoreSlug(slugify(e.target.value))
   }
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
 
     const name = storeName.trim()
     const slug = storeSlug.trim()
-    const logoUrl = storeLogoUrl.trim()
-    const description = storeDescription.trim()
-    const city = storeCity.trim()
-    const state = storeState.trim()
 
-    console.log('name:', name)
-    console.log('slug:', slug)
-    console.log('logoUrl:', logoUrl)
-    console.log('description:', description)
-    console.log('city:', city)
-    console.log('state:', state)
+    if (!name || !slug) {
+      setError('Nome e slug sao obrigatorios')
+      return
+    }
 
-    navigate('/store/onboarding')
+    setSubmitting(true)
+    setError(null)
+
+    try {
+      const token = await window.Clerk?.session?.getToken()
+      
+      const response = await fetch(`${API_URL}/stores`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: token ? `Bearer ${token}` : ''
+        },
+        body: JSON.stringify({
+          name,
+          slug,
+          logoUrl: storeLogoUrl.trim(),
+          description: storeDescription.trim(),
+          location: {
+            city: storeCity.trim(),
+            state: storeState.trim()
+          }
+        })
+      })
+
+      if (!response.ok) {
+        const data = await response.json()
+        throw new Error(data.error || 'Erro ao criar loja')
+      }
+
+      const store = await response.json()
+      
+      navigate('/dashboard')
+    } catch (err) {
+      setError(err.message)
+    } finally {
+      setSubmitting(false)
+    }
   }
 
   return (
@@ -68,6 +112,12 @@ function CreateStore() {
           Preencha as informações iniciais da sua loja.
         </p>
       </div>
+
+      {error && (
+        <div className="create-store__error" style={{ color: 'red', marginBottom: '1rem' }}>
+          {error}
+        </div>
+      )}
 
       <form className="create-store__form" onSubmit={handleSubmit}>
         <div className="create-store__section">
@@ -81,6 +131,7 @@ function CreateStore() {
               value={storeName}
               onChange={handleStoreNameChange}
               placeholder="Ex: Loja do Bruno TCG"
+              required
             />
           </label>
 
@@ -92,6 +143,7 @@ function CreateStore() {
               value={storeSlug}
               onChange={handleStoreSlugChange}
               placeholder="loja-do-bruno-tcg"
+              required
             />
             <span className="create-store__hint">
               URL da loja: /store/{storeSlug || 'minha-loja'}
@@ -158,14 +210,16 @@ function CreateStore() {
           <button
             className="create-store__button create-store__button--primary"
             type="submit"
+            disabled={submitting}
           >
-            Criar loja
+            {submitting ? 'Criando...' : 'Criar loja'}
           </button>
 
           <button
             className="create-store__button create-store__button--secondary"
             type="button"
             onClick={() => navigate('/')}
+            disabled={submitting}
           >
             Cancelar
           </button>
