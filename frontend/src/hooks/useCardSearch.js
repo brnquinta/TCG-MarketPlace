@@ -6,6 +6,11 @@ import {
   getSets,
 } from '../services/pokemonTcg'
 
+// CACHE GLOBAL
+let cachedSets = null
+let cachedRarities = null
+let cachedUsd = null
+
 function useCardSearch() {
   const [filters, setFilters] = useState({
     name: '',
@@ -21,7 +26,6 @@ function useCardSearch() {
   const [rarities, setRarities] = useState([])
   const [sets, setSets] = useState([])
   const [searched, setSearched] = useState(false)
-  const [lastSearch, setLastSearch] = useState('')
   const [loadingOptions, setLoadingOptions] = useState(false)
 
   const [setQuery, setSetQuery] = useState('')
@@ -31,20 +35,37 @@ function useCardSearch() {
 
   useEffect(() => {
     const fetchInitialData = async () => {
+      if (cachedUsd && cachedRarities && cachedSets) {
+        console.log('USANDO CACHE')
+
+        setUsdToBrl(cachedUsd)
+        setRarities(cachedRarities)
+        setSets(cachedSets)
+
+        return
+      }
+
       setLoadingOptions(true)
 
       try {
+        console.log('BUSCANDO DADOS LOCAIS')
+
         const [cotacao, raritiesData, setsData] = await Promise.all([
           getUsdToBrl().catch(() => 5.8),
           getRarities(),
           getSets(),
         ])
 
-        setUsdToBrl(cotacao)
-        setRarities(raritiesData.data || [])
-        setSets(setsData.data || [])
+        cachedUsd = cotacao
+        cachedRarities = raritiesData.data || []
+        cachedSets = setsData.data || []
+
+        setUsdToBrl(cachedUsd)
+        setRarities(cachedRarities)
+        setSets(cachedSets)
       } catch (err) {
         console.error('Erro ao carregar filtros:', err)
+
         setUsdToBrl(5.8)
       } finally {
         setLoadingOptions(false)
@@ -82,7 +103,7 @@ function useCardSearch() {
 
   const hasFilter = useMemo(() => {
     return Object.values(normalizedFilters).some(
-      (value) => (typeof value === 'string' ? value !== '' : Boolean(value))
+      (value) => value !== ''
     )
   }, [normalizedFilters])
 
@@ -155,11 +176,10 @@ function useCardSearch() {
       e.preventDefault()
     }
 
-    if (!hasFilter) return
-
-    const currentSearch = JSON.stringify(normalizedFilters)
-
-    if (currentSearch === lastSearch) return
+    if (!hasFilter) {
+      setCards([])
+      return
+    }
 
     setLoading(true)
     setError('')
@@ -173,9 +193,9 @@ function useCardSearch() {
       })
 
       setCards(response.data || [])
-      setLastSearch(currentSearch)
     } catch (err) {
       console.error('Erro ao buscar cartas:', err)
+
       setError('Erro ao buscar cartas. Tente novamente.')
       setCards([])
     } finally {
@@ -196,7 +216,6 @@ function useCardSearch() {
     setCards([])
     setSearched(false)
     setError('')
-    setLastSearch('')
   }
 
   return {
@@ -210,7 +229,6 @@ function useCardSearch() {
     rarities,
     sets,
     searched,
-    lastSearch,
     loadingOptions,
     setQuery,
     showSetSuggestions,

@@ -6,6 +6,7 @@ import dotenv from 'dotenv'
 
 import connectDB from './config/db.js'
 import authRoutes from './routes/authRoutes.js'
+import pokemonRoutes from './routes/pokemonProxyRoutes.js'
 import storeRoutes from './routes/storeRoutes.js'
 import listingRoutes from './routes/listingRoutes.js'
 import webhookRoutes from './routes/webhookRoutes.js'
@@ -14,6 +15,8 @@ import debugRoutes from './routes/debugRoutes.js'
 import { authenticateToken, optionalAuth } from './middleware/auth.js'
 
 dotenv.config()
+
+console.log('ENV KEY:', process.env.POKEMON_TCG_API_KEY)
 
 const app = express()
 const PORT = process.env.PORT || 3001
@@ -39,6 +42,7 @@ app.use('/api/listings', optionalAuth, listingRoutes)
 app.use('/api/webhooks', webhookRoutes)
 app.use('/api/cart', authenticateToken, cartRoutes)
 app.use('/api/debug', debugRoutes)
+app.use('/api', pokemonRoutes)
 
 app.use((err, req, res, next) => {
   console.error(err.stack)
