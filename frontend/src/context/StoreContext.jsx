@@ -11,6 +11,9 @@ export function StoreProvider({ children }) {
   const [store, setStore] = useState(null)
   const [loading, setLoading] = useState(true)
 
+  // ⭐ ADICIONADO: listings local state
+  const [listings, setListings] = useState([])
+
   const [listingFilters, setListingFilters] = useState({
     condition: '',
     priceMin: '',
@@ -60,6 +63,7 @@ export function StoreProvider({ children }) {
     fetchStore()
   }, [user, isLoaded])
 
+  // ================= STORE =================
   const updateStore = (updates) => {
     setStore((prev) => (prev ? { ...prev, ...updates } : null))
   }
@@ -78,17 +82,46 @@ export function StoreProvider({ children }) {
     )
   }
 
+  // ================= LISTINGS (NOVO) =================
+  const addListing = (listing) => {
+    setListings((prev) => [listing, ...prev])
+  }
+
+  const removeListing = (listingId) => {
+    setListings((prev) =>
+      prev.filter((item) => item._id !== listingId)
+    )
+  }
+
+  const updateListing = (listingId, updates) => {
+    setListings((prev) =>
+      prev.map((item) =>
+        item._id === listingId
+          ? { ...item, ...updates }
+          : item
+      )
+    )
+  }
+
   return (
     <StoreContext.Provider
       value={{
         store,
         loading,
         hasStore: !!store,
+
         fetchStore,
         updateStore,
         updateLocation,
+
         listingFilters,
         setListingFilters,
+
+        // ⭐ ADICIONADO AQUI
+        listings,
+        addListing,
+        removeListing,
+        updateListing,
       }}
     >
       {children}

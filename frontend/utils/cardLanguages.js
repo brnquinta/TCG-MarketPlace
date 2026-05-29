@@ -12,6 +12,7 @@ export const CARD_LANGUAGE_FILTER_OPTIONS = [
 ]
 
 export const CARD_LANGUAGE_FORM_OPTIONS = [
-  { value: '', label: 'Selecione' },
-  ...CARD_LANGUAGES,
+  { value: 'PT-BR', label: 'Português' },
+  { value: 'EN', label: 'Inglês' },
+  { value: 'JP', label: 'Japonês' },
 ]

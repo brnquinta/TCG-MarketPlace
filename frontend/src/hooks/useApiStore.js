@@ -5,17 +5,24 @@ import { useStore } from './useStore'
 
 export function useApiStore() {
   const { user, isLoaded } = useUser()
-  const { createStore: setLocalStore, addListing: addLocalListing, removeListing: removeLocalListing, updateStore: updateLocalStore } = useStore()
-  
+
+  const storeContext = useStore()
+
+  const setLocalStore = storeContext?.createStore
+  const addLocalListing = storeContext?.addListing
+  const removeLocalListing = storeContext?.removeListing
+  const updateLocalStore = storeContext?.updateStore
+
   const [isSyncing, setIsSyncing] = useState(false)
   const [error, setError] = useState(null)
 
+  /* ================= AUTH SYNC ================= */
   const syncUserToBackend = useCallback(async () => {
     if (!user || !isLoaded) return
-    
+
     setIsSyncing(true)
     setError(null)
-    
+
     try {
       await authAPI.syncUser({
         clerkId: user.id,
@@ -32,16 +39,15 @@ export function useApiStore() {
     }
   }, [user, isLoaded])
 
+  /* ================= STORE ================= */
   const fetchStoreFromBackend = useCallback(async () => {
     if (!user) return null
-    
+
     try {
       const response = await storeAPI.getMyStore()
       return response.data
     } catch (err) {
-      if (err.response?.status === 404) {
-        return null
-      }
+      if (err?.response?.status === 404) return null
       console.error('Error fetching store:', err)
       return null
     }
@@ -50,13 +56,15 @@ export function useApiStore() {
   const createStoreOnBackend = useCallback(async (storeData) => {
     try {
       const response = await storeAPI.create(storeData)
-      setLocalStore({
+
+      setLocalStore?.({
         name: response.data.name,
         slug: response.data.slug,
         logoUrl: response.data.logoUrl,
         description: response.data.description,
         location: response.data.location,
       })
+
       return response.data
     } catch (err) {
       console.error('Error creating store:', err)
@@ -67,7 +75,9 @@ export function useApiStore() {
   const updateStoreOnBackend = useCallback(async (storeData) => {
     try {
       const response = await storeAPI.update(storeData)
-      updateLocalStore(response.data)
+
+      updateLocalStore?.(response.data)
+
       return response.data
     } catch (err) {
       console.error('Error updating store:', err)
@@ -75,9 +85,10 @@ export function useApiStore() {
     }
   }, [updateLocalStore])
 
+  /* ================= LISTINGS ================= */
   const fetchListingsFromBackend = useCallback(async () => {
     if (!user) return []
-    
+
     try {
       const response = await listingAPI.getMyListings()
       return response.data
@@ -87,21 +98,34 @@ export function useApiStore() {
     }
   }, [user])
 
-  const createListingOnBackend = useCallback(async (listingData) => {
-    try {
-      const response = await listingAPI.create(listingData)
-      addLocalListing(response.data)
-      return response.data
-    } catch (err) {
-      console.error('Error creating listing:', err)
-      throw err
+const createListingOnBackend = useCallback(async (listingData) => {
+  try {
+    const response = await listingAPI.create(listingData)
+
+    console.log("🔥 BACKEND RESPONSE FULL:", response)
+
+    const listing = response // 👈 AQUI É O FIX
+
+    console.log("🔥 LISTING FINAL:", listing)
+
+    if (addLocalListing) {
+      addLocalListing(listing)
     }
-  }, [addLocalListing])
+
+    return listing
+  } catch (err) {
+    console.error('Error creating listing:', err)
+    throw err
+  }
+}, [addLocalListing])
 
   const deleteListingOnBackend = useCallback(async (listingId) => {
     try {
       await listingAPI.delete(listingId)
-      removeLocalListing(listingId)
+
+      if (removeLocalListing) {
+        removeLocalListing(listingId)
+      }
     } catch (err) {
       console.error('Error deleting listing:', err)
       throw err

@@ -168,7 +168,7 @@ function NewListing() {
     setSelectedCard(null)
   }
 
- const handleCreate = async (e) => {
+const handleCreate = async (e) => {
   e.preventDefault()
 
   if (!selectedCard) return
@@ -218,10 +218,17 @@ function NewListing() {
 
     const result = await createListingOnBackend(payload)
 
-    console.log('Anúncio criado:', result)
+    console.log('🔥 RESULT FINAL:', result)
 
-    // opcional: redirecionar
-    // navigate('/dashboard')
+    const id = result?._id
+
+    if (!id) {
+      console.error('❌ ID não encontrado no resultado:', result)
+      return
+    }
+
+    // 👇 AGORA SIM FUNCIONA
+    navigate(`/listing/${id}`)
 
   } catch (err) {
     console.error('Erro ao criar anúncio:', err)
