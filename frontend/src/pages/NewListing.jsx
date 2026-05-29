@@ -3,6 +3,7 @@ import useCardSearch from '../hooks/useCardSearch'
 import { CARD_CONDITIONS } from '../../utils/cardConditions'
 import { CARD_LANGUAGE_FORM_OPTIONS } from '../../utils/cardLanguages'
 import { useApiStore } from '../hooks/useApiStore'
+import { useNavigate } from 'react-router-dom'
 
 const PHOTO_STEPS = [
   {
@@ -32,6 +33,7 @@ const PHOTO_STEPS = [
 ]
 
 function NewListing() {
+  const navigate = useNavigate()
   const { createListingOnBackend } = useApiStore()
   const [listingData, setListingData] = useState({
     language: '',
