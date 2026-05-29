@@ -7,8 +7,10 @@ const StoreContext = createContext(null)
 
 export function StoreProvider({ children }) {
   const { user, isLoaded } = useUser()
+
   const [store, setStore] = useState(null)
   const [loading, setLoading] = useState(true)
+
   const [listingFilters, setListingFilters] = useState({
     condition: '',
     priceMin: '',
@@ -17,60 +19,65 @@ export function StoreProvider({ children }) {
     language: '',
   })
 
-  useEffect(() => {
-    let isMounted = true
+  async function fetchStore() {
+    if (!isLoaded || !user || !user.id) {
+      setStore(null)
+      setLoading(false)
+      return
+    }
 
-    async function fetchStore() {
-      if (!isLoaded || !user || !user.id) {
-        if (isMounted) {
-          setStore(null)
-          setLoading(false)
-        }
+    try {
+      setLoading(true)
+
+      const token = await window.Clerk?.session?.getToken()
+
+      if (!token) {
+        setLoading(false)
         return
       }
 
-      try {
-        const token = await window.Clerk?.session?.getToken()
-        if (!token) {
-          if (isMounted) setLoading(false)
-          return
+      const response = await fetch(`${API_URL}/stores/me`, {
+        headers: {
+          Authorization: `Bearer ${token}`
         }
+      })
 
-        const response = await fetch(`${API_URL}/stores/me`, {
-          headers: { Authorization: `Bearer ${token}` }
-        })
-
-        if (!isMounted) return
-
-        if (response.ok) {
-          const data = await response.json()
-          setStore(data)
-        } else {
-          setStore(null)
-        }
-      } catch (err) {
-        if (isMounted) setStore(null)
-      } finally {
-        if (isMounted) setLoading(false)
+      if (response.ok) {
+        const data = await response.json()
+        setStore(data)
+      } else {
+        setStore(null)
       }
+    } catch (err) {
+      console.error(err)
+      setStore(null)
+    } finally {
+      setLoading(false)
     }
+  }
 
+  useEffect(() => {
     fetchStore()
-
-    return () => {
-      isMounted = false
-    }
   }, [user, isLoaded])
 
   const updateStore = (updates) => {
-    setStore((prev) => prev ? { ...prev, ...updates } : null)
+    setStore((prev) =>
+      prev ? { ...prev, ...updates } : null
+    )
   }
 
   const updateLocation = (updates) => {
-    setStore((prev) => prev ? {
-      ...prev,
-      location: { ...prev.location, ...updates }
-    } : null)
+    setStore((prev) =>
+      prev
+        ? {
+            ...prev,
+            location: {
+              ...prev.location,
+              ...updates
+            }
+          }
+        : null
+    )
   }
 
   return (
@@ -79,6 +86,7 @@ export function StoreProvider({ children }) {
         store,
         loading,
         hasStore: !!store,
+        fetchStore,
         updateStore,
         updateLocation,
         listingFilters,
@@ -92,8 +100,12 @@ export function StoreProvider({ children }) {
 
 export function useStore() {
   const context = useContext(StoreContext)
+
   if (!context) {
-    throw new Error('useStore must be used within StoreProvider')
+    throw new Error(
+      'useStore must be used within StoreProvider'
+    )
   }
+
   return context
 }

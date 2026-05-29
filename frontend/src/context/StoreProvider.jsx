@@ -1,238 +1,271 @@
-import { useState, useEffect, useCallback } from 'react'
-import { useUser } from '@clerk/clerk-react'
-import { StoreContext } from './StoreContext'
-import { authAPI, storeAPI, listingAPI } from '../services/api'
+import { useState } from 'react'
+import { useNavigate, Navigate } from 'react-router-dom'
+import { useStore } from '../context/StoreContext'
+import { brazilStates } from '../../utils/brazilianStates.js'
 
-const STORAGE_KEY = 'tcg_marketplace_store'
-const LISTINGS_KEY = 'tcg_marketplace_listings'
+function CreateStore() {
+  const navigate = useNavigate()
 
-function getInitialStore() {
-  try {
-    const stored = localStorage.getItem(STORAGE_KEY)
-    return stored ? JSON.parse(stored) : null
-  } catch {
-    return null
+  const {
+    store,
+    isLoading,
+    createStore
+  } = useStore()
+
+  const [storeName, setStoreName] = useState('')
+  const [storeSlug, setStoreSlug] = useState('')
+  const [storeLogoUrl, setStoreLogoUrl] = useState('')
+  const [storeDescription, setStoreDescription] = useState('')
+  const [storeCity, setStoreCity] = useState('')
+  const [storeState, setStoreState] = useState('')
+
+  const [slugTouched, setSlugTouched] = useState(false)
+
+  const [submitting, setSubmitting] = useState(false)
+  const [error, setError] = useState(null)
+
+  if (isLoading) {
+    return <div>Carregando...</div>
   }
-}
 
-function getStoredListings() {
-  try {
-    const stored = localStorage.getItem(LISTINGS_KEY)
-    return stored ? JSON.parse(stored) : []
-  } catch {
-    return []
+  if (store) {
+    return <Navigate to="/dashboard" replace />
   }
-}
 
-function saveToLocalStorage(key, data) {
-  try {
-    localStorage.setItem(key, JSON.stringify(data))
-  } catch (e) {
-    console.warn('LocalStorage save failed:', e)
+  const slugify = (value) => {
+    return value
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/[^a-z0-9\s-]/g, '')
+      .trim()
+      .replace(/\s+/g, '-')
+      .replace(/-+/g, '-')
   }
-}
 
-export function StoreProvider({ children }) {
-  const { user, isLoaded, isSignedIn } = useUser()
-  
-  const [store, setStore] = useState(() => getInitialStore())
-  const [listings, setListings] = useState(() => getStoredListings())
-  const [isLoading, setIsLoading] = useState(true)
-  const [syncError, setSyncError] = useState(null)
+  const handleStoreNameChange = (e) => {
+    const value = e.target.value
 
-  useEffect(() => {
-    const syncData = async () => {
-      if (!isSignedIn || !user) {
-        setIsLoading(false)
-        return
-      }
+    setStoreName(value)
 
-      setIsLoading(true)
-      setSyncError(null)
+    if (!slugTouched) {
+      setStoreSlug(slugify(value))
+    }
+  }
 
-      try {
-        await authAPI.syncUser({
-          clerkId: user.id,
-          email: user.primaryEmailAddress?.emailAddress,
-          firstName: user.firstName,
-          lastName: user.lastName,
-          imageUrl: user.imageUrl,
-        })
+  const handleStoreSlugChange = (e) => {
+    setSlugTouched(true)
+    setStoreSlug(slugify(e.target.value))
+  }
 
-        const storeRes = await storeAPI.getMyStore()
-        if (storeRes.data) {
-          setStore(storeRes.data)
-          saveToLocalStorage(STORAGE_KEY, storeRes.data)
-          
-          const listingsRes = await listingAPI.getMyListings()
-          setListings(listingsRes.data)
-          saveToLocalStorage(LISTINGS_KEY, listingsRes.data)
-        }
-      } catch (err) {
-        console.warn('Backend sync failed, using localStorage:', err.message)
-        setSyncError('Offline mode - using local data')
-        setStore(getInitialStore())
-        setListings(getStoredListings())
-      } finally {
-        setIsLoading(false)
-      }
+  const handleSubmit = async (e) => {
+    e.preventDefault()
+
+    const name = storeName.trim()
+    const slug = storeSlug.trim()
+
+    if (!name || !slug) {
+      setError('Nome e slug são obrigatórios')
+      return
     }
 
-    syncData()
-  }, [user, isSignedIn, isLoaded])
-
-  const hasStore = store !== null
-  const hasListings = listings.length > 0
-
-  const [listingFilters, setListingFilters] = useState({
-    condition: '',
-    priceMin: '',
-    priceMax: '',
-    certified: '',
-    language: '',
-  })
-
-  const createStore = useCallback(async (storeData) => {
-    const newStoreData = {
-      name: storeData.name || '',
-      slug: storeData.slug || '',
-      logoUrl: storeData.logoUrl || '',
-      bannerUrl: storeData.bannerUrl || '',
-      description: storeData.description || '',
-      location: {
-        city: storeData.city || '',
-        state: storeData.state || '',
-      },
-    }
+    setSubmitting(true)
+    setError(null)
 
     try {
-      const response = await storeAPI.create(newStoreData)
-      setStore(response.data)
-      saveToLocalStorage(STORAGE_KEY, response.data)
-      return response.data
-    } catch (err) {
-      console.error('Backend createStore failed:', err)
-      const localStore = { ...newStoreData, _id: `local_${Date.now()}`, status: 'draft' }
-      setStore(localStore)
-      saveToLocalStorage(STORAGE_KEY, localStore)
-      return localStore
-    }
-  }, [])
-
-  const updateStore = useCallback(async (updates) => {
-    const updated = store ? { ...store, ...updates } : updates
-    
-    try {
-      const response = await storeAPI.update(updates)
-      setStore(response.data)
-      saveToLocalStorage(STORAGE_KEY, response.data)
-    } catch (err) {
-      console.warn('Backend updateStore failed, updating locally:', err.message)
-      setStore(updated)
-      saveToLocalStorage(STORAGE_KEY, updated)
-    }
-  }, [store])
-
-  const updateLocation = useCallback(async (updates) => {
-    const updated = store ? { ...store, location: { ...store.location, ...updates } } : null
-    if (!updated) return
-
-    try {
-      const response = await storeAPI.update({ location: updated.location })
-      setStore(response.data)
-      saveToLocalStorage(STORAGE_KEY, response.data)
-    } catch (err) {
-      console.warn('Backend updateLocation failed:', err.message)
-      setStore(updated)
-      saveToLocalStorage(STORAGE_KEY, updated)
-    }
-  }, [store])
-
-  const deleteStore = useCallback(() => {
-    setStore(null)
-    setListings([])
-    localStorage.removeItem(STORAGE_KEY)
-    localStorage.removeItem(LISTINGS_KEY)
-  }, [])
-
-  const addListing = useCallback(async (listing) => {
-    const newListing = {
-      ...listing,
-      _id: `listing_${Date.now()}`,
-      createdAt: new Date().toISOString(),
-    }
-
-    try {
-      const response = await listingAPI.create(listing)
-      setListings((prev) => {
-        const updated = [...prev, response.data]
-        saveToLocalStorage(LISTINGS_KEY, updated)
-        return updated
+      await createStore({
+        name,
+        slug,
+        logoUrl: storeLogoUrl.trim(),
+        description: storeDescription.trim(),
+        city: storeCity.trim(),
+        state: storeState.trim(),
       })
-      
-      if (store) {
-        setStore((prev) => {
-          if (!prev) return prev
-          const updated = { ...prev, stats: { ...prev.stats, activeListings: prev.stats.activeListings + 1 } }
-          saveToLocalStorage(STORAGE_KEY, updated)
-          return updated
-        })
-      }
-      return response.data
-    } catch (err) {
-      console.warn('Backend addListing failed:', err.message)
-      setListings((prev) => {
-        const updated = [...prev, newListing]
-        saveToLocalStorage(LISTINGS_KEY, updated)
-        return updated
-      })
-      return newListing
-    }
-  }, [store])
 
-  const removeListing = useCallback(async (listingId) => {
-    try {
-      await listingAPI.delete(listingId)
+      navigate('/dashboard')
     } catch (err) {
-      console.warn('Backend removeListing failed:', err.message)
+      setError(err.message)
+    } finally {
+      setSubmitting(false)
     }
-
-    setListings((prev) => {
-      const updated = prev.filter((item) => item._id !== listingId)
-      saveToLocalStorage(LISTINGS_KEY, updated)
-      return updated
-    })
-    
-    if (store) {
-      setStore((prev) => {
-        if (!prev) return prev
-        const updated = { ...prev, stats: { ...prev.stats, activeListings: Math.max(0, prev.stats.activeListings - 1) } }
-        saveToLocalStorage(STORAGE_KEY, updated)
-        return updated
-      })
-    }
-  }, [store])
+  }
 
   return (
-    <StoreContext.Provider
-      value={{
-        store,
-        listings,
-        hasStore,
-        hasListings,
-        isLoading,
-        syncError,
-        createStore,
-        updateStore,
-        updateLocation,
-        deleteStore,
-        addListing,
-        removeListing,
-        listingFilters,
-        setListingFilters,
-      }}
-    >
-      {children}
-    </StoreContext.Provider>
+    <section className="create-store">
+      <div className="create-store__header">
+        <h1 className="create-store__title">
+          Criar loja
+        </h1>
+
+        <p className="create-store__subtitle">
+          Preencha as informações iniciais da sua loja.
+        </p>
+      </div>
+
+      {error && (
+        <div
+          className="create-store__error"
+          style={{
+            color: 'red',
+            marginBottom: '1rem'
+          }}
+        >
+          {error}
+        </div>
+      )}
+
+      <form
+        className="create-store__form"
+        onSubmit={handleSubmit}
+      >
+        <div className="create-store__section">
+          <h2 className="create-store__section-title">
+            Informações da loja
+          </h2>
+
+          <label className="create-store__field">
+            <span className="create-store__label">
+              Nome da loja
+            </span>
+
+            <input
+              className="create-store__input"
+              type="text"
+              value={storeName}
+              onChange={handleStoreNameChange}
+              placeholder="Ex: Loja do Bruno TCG"
+              required
+            />
+          </label>
+
+          <label className="create-store__field">
+            <span className="create-store__label">
+              Slug
+            </span>
+
+            <input
+              className="create-store__input"
+              type="text"
+              value={storeSlug}
+              onChange={handleStoreSlugChange}
+              placeholder="loja-do-bruno-tcg"
+              required
+            />
+
+            <span className="create-store__hint">
+              URL da loja:
+              {' '}
+              /store/{storeSlug || 'minha-loja'}
+            </span>
+          </label>
+
+          <label className="create-store__field">
+            <span className="create-store__label">
+              Logo da loja
+            </span>
+
+            <input
+              className="create-store__input"
+              type="url"
+              value={storeLogoUrl}
+              onChange={(e) =>
+                setStoreLogoUrl(e.target.value)
+              }
+              placeholder="https://..."
+            />
+          </label>
+
+          <label className="create-store__field">
+            <span className="create-store__label">
+              Descrição
+            </span>
+
+            <textarea
+              className="create-store__textarea"
+              value={storeDescription}
+              onChange={(e) =>
+                setStoreDescription(e.target.value)
+              }
+              placeholder="Descreva sua loja"
+              rows="5"
+            />
+          </label>
+        </div>
+
+        <div className="create-store__section">
+          <h2 className="create-store__section-title">
+            Localização
+          </h2>
+
+          <div className="create-store__grid">
+            <label className="create-store__field">
+              <span className="create-store__label">
+                Cidade
+              </span>
+
+              <input
+                className="create-store__input"
+                type="text"
+                value={storeCity}
+                onChange={(e) =>
+                  setStoreCity(e.target.value)
+                }
+                placeholder="Ex: Rio de Janeiro"
+              />
+            </label>
+
+            <label className="create-store__field">
+              <span className="create-store__label">
+                Estado
+              </span>
+
+              <select
+                className="create-store__input"
+                value={storeState}
+                onChange={(e) =>
+                  setStoreState(e.target.value)
+                }
+              >
+                <option value="">
+                  Selecione
+                </option>
+
+                {brazilStates.map((state) => (
+                  <option
+                    key={state.value}
+                    value={state.value}
+                  >
+                    {state.label}
+                  </option>
+                ))}
+              </select>
+            </label>
+          </div>
+        </div>
+
+        <div className="create-store__actions">
+          <button
+            className="create-store__button create-store__button--primary"
+            type="submit"
+            disabled={submitting}
+          >
+            {submitting
+              ? 'Criando...'
+              : 'Criar loja'}
+          </button>
+
+          <button
+            className="create-store__button create-store__button--secondary"
+            type="button"
+            onClick={() => navigate('/')}
+            disabled={submitting}
+          >
+            Cancelar
+          </button>
+        </div>
+      </form>
+    </section>
   )
 }
+
+export default CreateStore

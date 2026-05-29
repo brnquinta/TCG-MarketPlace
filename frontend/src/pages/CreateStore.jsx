@@ -7,15 +7,12 @@ const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api'
 
 function CreateStore() {
   const navigate = useNavigate()
-  const { store, loading: storeLoading } = useStore()
 
-  if (storeLoading) {
-    return <div>Carregando...</div>
-  }
-
-  if (store) {
-    return <Navigate to="/dashboard" replace />
-  }
+  const {
+    store,
+    loading: storeLoading,
+    fetchStore
+  } = useStore()
 
   const [storeName, setStoreName] = useState('')
   const [storeSlug, setStoreSlug] = useState('')
@@ -28,6 +25,14 @@ function CreateStore() {
 
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState(null)
+
+  if (storeLoading) {
+    return <div>Carregando...</div>
+  }
+
+  if (store) {
+    return <Navigate to="/dashboard" replace />
+  }
 
   const slugify = (value) => {
     return value
@@ -42,6 +47,7 @@ function CreateStore() {
 
   const handleStoreNameChange = (e) => {
     const value = e.target.value
+
     setStoreName(value)
 
     if (!slugTouched) {
@@ -61,7 +67,7 @@ function CreateStore() {
     const slug = storeSlug.trim()
 
     if (!name || !slug) {
-      setError('Nome e slug sao obrigatorios')
+      setError('Nome e slug são obrigatórios')
       return
     }
 
@@ -70,12 +76,14 @@ function CreateStore() {
 
     try {
       const token = await window.Clerk?.session?.getToken()
-      
+
       const response = await fetch(`${API_URL}/stores`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: token ? `Bearer ${token}` : ''
+          Authorization: token
+            ? `Bearer ${token}`
+            : ''
         },
         body: JSON.stringify({
           name,
@@ -91,11 +99,19 @@ function CreateStore() {
 
       if (!response.ok) {
         const data = await response.json()
-        throw new Error(data.error || 'Erro ao criar loja')
+
+        throw new Error(
+          data.error || 'Erro ao criar loja'
+        )
       }
 
-      const store = await response.json()
-      
+      const createdStore = await response.json()
+
+      console.log(createdStore)
+
+      // atualiza o contexto antes do navigate
+      await fetchStore()
+
       navigate('/dashboard')
     } catch (err) {
       setError(err.message)
@@ -107,24 +123,41 @@ function CreateStore() {
   return (
     <section className="create-store">
       <div className="create-store__header">
-        <h1 className="create-store__title">Criar loja</h1>
+        <h1 className="create-store__title">
+          Criar loja
+        </h1>
+
         <p className="create-store__subtitle">
           Preencha as informações iniciais da sua loja.
         </p>
       </div>
 
       {error && (
-        <div className="create-store__error" style={{ color: 'red', marginBottom: '1rem' }}>
+        <div
+          className="create-store__error"
+          style={{
+            color: 'red',
+            marginBottom: '1rem'
+          }}
+        >
           {error}
         </div>
       )}
 
-      <form className="create-store__form" onSubmit={handleSubmit}>
+      <form
+        className="create-store__form"
+        onSubmit={handleSubmit}
+      >
         <div className="create-store__section">
-          <h2 className="create-store__section-title">Informações da loja</h2>
+          <h2 className="create-store__section-title">
+            Informações da loja
+          </h2>
 
           <label className="create-store__field">
-            <span className="create-store__label">Nome da loja</span>
+            <span className="create-store__label">
+              Nome da loja
+            </span>
+
             <input
               className="create-store__input"
               type="text"
@@ -136,7 +169,10 @@ function CreateStore() {
           </label>
 
           <label className="create-store__field">
-            <span className="create-store__label">Slug</span>
+            <span className="create-store__label">
+              Slug
+            </span>
+
             <input
               className="create-store__input"
               type="text"
@@ -145,28 +181,41 @@ function CreateStore() {
               placeholder="loja-do-bruno-tcg"
               required
             />
+
             <span className="create-store__hint">
-              URL da loja: /store/{storeSlug || 'minha-loja'}
+              URL da loja:
+              {' '}
+              /store/{storeSlug || 'minha-loja'}
             </span>
           </label>
 
           <label className="create-store__field">
-            <span className="create-store__label">Logo da loja</span>
+            <span className="create-store__label">
+              Logo da loja
+            </span>
+
             <input
               className="create-store__input"
               type="url"
               value={storeLogoUrl}
-              onChange={(e) => setStoreLogoUrl(e.target.value)}
+              onChange={(e) =>
+                setStoreLogoUrl(e.target.value)
+              }
               placeholder="https://..."
             />
           </label>
 
           <label className="create-store__field">
-            <span className="create-store__label">Descrição</span>
+            <span className="create-store__label">
+              Descrição
+            </span>
+
             <textarea
               className="create-store__textarea"
               value={storeDescription}
-              onChange={(e) => setStoreDescription(e.target.value)}
+              onChange={(e) =>
+                setStoreDescription(e.target.value)
+              }
               placeholder="Descreva sua loja"
               rows="5"
             />
@@ -174,30 +223,48 @@ function CreateStore() {
         </div>
 
         <div className="create-store__section">
-          <h2 className="create-store__section-title">Localização</h2>
+          <h2 className="create-store__section-title">
+            Localização
+          </h2>
 
           <div className="create-store__grid">
             <label className="create-store__field">
-              <span className="create-store__label">Cidade</span>
+              <span className="create-store__label">
+                Cidade
+              </span>
+
               <input
                 className="create-store__input"
                 type="text"
                 value={storeCity}
-                onChange={(e) => setStoreCity(e.target.value)}
+                onChange={(e) =>
+                  setStoreCity(e.target.value)
+                }
                 placeholder="Ex: Rio de Janeiro"
               />
             </label>
 
             <label className="create-store__field">
-              <span className="create-store__label">Estado</span>
+              <span className="create-store__label">
+                Estado
+              </span>
+
               <select
                 className="create-store__input"
                 value={storeState}
-                onChange={(e) => setStoreState(e.target.value)}
+                onChange={(e) =>
+                  setStoreState(e.target.value)
+                }
               >
-                <option value="">Selecione</option>
+                <option value="">
+                  Selecione
+                </option>
+
                 {brazilStates.map((state) => (
-                  <option key={state.value} value={state.value}>
+                  <option
+                    key={state.value}
+                    value={state.value}
+                  >
                     {state.label}
                   </option>
                 ))}
@@ -212,7 +279,9 @@ function CreateStore() {
             type="submit"
             disabled={submitting}
           >
-            {submitting ? 'Criando...' : 'Criar loja'}
+            {submitting
+              ? 'Criando...'
+              : 'Criar loja'}
           </button>
 
           <button
