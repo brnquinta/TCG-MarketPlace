@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom'
 import { SignedIn, SignedOut, SignInButton } from '@clerk/clerk-react'
 import { useUser } from "@clerk/clerk-react";
-import { useStore } from "../context/StoreContext";
+import { useStore } from '../hooks/useStore';
 
 
 function Home() {

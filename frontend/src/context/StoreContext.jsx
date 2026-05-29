@@ -1,9 +1,9 @@
-import { createContext, useContext, useState, useEffect } from 'react'
+import { createContext, useState, useEffect } from 'react'
 import { useUser } from '@clerk/clerk-react'
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api'
+export const StoreContext = createContext(null)
 
-const StoreContext = createContext(null)
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api'
 
 export function StoreProvider({ children }) {
   const { user, isLoaded } = useUser()
@@ -20,7 +20,7 @@ export function StoreProvider({ children }) {
   })
 
   async function fetchStore() {
-    if (!isLoaded || !user || !user.id) {
+    if (!isLoaded || !user?.id) {
       setStore(null)
       setLoading(false)
       return
@@ -38,8 +38,8 @@ export function StoreProvider({ children }) {
 
       const response = await fetch(`${API_URL}/stores/me`, {
         headers: {
-          Authorization: `Bearer ${token}`
-        }
+          Authorization: `Bearer ${token}`,
+        },
       })
 
       if (response.ok) {
@@ -49,7 +49,7 @@ export function StoreProvider({ children }) {
         setStore(null)
       }
     } catch (err) {
-      console.error(err)
+      console.error('Erro fetchStore:', err)
       setStore(null)
     } finally {
       setLoading(false)
@@ -61,9 +61,7 @@ export function StoreProvider({ children }) {
   }, [user, isLoaded])
 
   const updateStore = (updates) => {
-    setStore((prev) =>
-      prev ? { ...prev, ...updates } : null
-    )
+    setStore((prev) => (prev ? { ...prev, ...updates } : null))
   }
 
   const updateLocation = (updates) => {
@@ -73,8 +71,8 @@ export function StoreProvider({ children }) {
             ...prev,
             location: {
               ...prev.location,
-              ...updates
-            }
+              ...updates,
+            },
           }
         : null
     )
@@ -96,16 +94,4 @@ export function StoreProvider({ children }) {
       {children}
     </StoreContext.Provider>
   )
-}
-
-export function useStore() {
-  const context = useContext(StoreContext)
-
-  if (!context) {
-    throw new Error(
-      'useStore must be used within StoreProvider'
-    )
-  }
-
-  return context
 }

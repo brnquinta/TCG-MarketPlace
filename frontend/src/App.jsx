@@ -1,5 +1,5 @@
 import { Routes, Route, Navigate } from 'react-router-dom'
-import { useStore } from './context/StoreContext.jsx'
+import { useStore } from './hooks/useStore'
 import MainLayout from './layouts/MainLayout.jsx'
 import Home from './pages/Home.jsx'
 import Search from './pages/Search.jsx'

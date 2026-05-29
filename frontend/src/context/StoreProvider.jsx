@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useNavigate, Navigate } from 'react-router-dom'
-import { useStore } from '../context/StoreContext'
+import { useStore } from '../hooks/useStore'
 import { brazilStates } from '../../utils/brazilianStates.js'
 
 function CreateStore() {

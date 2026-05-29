@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { useStore } from '../context/StoreContext'
+import { useStore } from '../hooks/useStore'
 
 
 function StoreDashboard() {

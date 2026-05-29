@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useNavigate, Navigate } from 'react-router-dom'
-import { useStore } from '../context/StoreContext'
+import { useStore } from '../hooks/useStore'
 import { brazilStates } from '../../utils/brazilianStates.js'
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api'

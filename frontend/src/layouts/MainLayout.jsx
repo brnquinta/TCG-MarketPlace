@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom'
 import { SignedIn, SignedOut, SignInButton, UserButton } from '@clerk/clerk-react'
-import { useStore } from '../context/StoreContext'
+import { useStore } from '../hooks/useStore'
 
 function MainLayout({ children }) {
   const { hasStore, loading: storeLoading } = useStore()

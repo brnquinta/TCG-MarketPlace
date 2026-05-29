@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react'
 import useCardSearch from '../hooks/useCardSearch'
 import { CARD_CONDITIONS } from '../../utils/cardConditions'
 import { CARD_LANGUAGE_FORM_OPTIONS } from '../../utils/cardLanguages'
+import { useApiStore } from '../hooks/useApiStore'
 
 const PHOTO_STEPS = [
   {
@@ -31,6 +32,7 @@ const PHOTO_STEPS = [
 ]
 
 function NewListing() {
+  const { createListingOnBackend } = useApiStore()
   const [listingData, setListingData] = useState({
     language: '',
     condition: '',
@@ -166,20 +168,20 @@ function NewListing() {
     setSelectedCard(null)
   }
 
-  const handleCreate = (e) => {
-    e.preventDefault()
+ const handleCreate = async (e) => {
+  e.preventDefault()
 
-    if (!selectedCard) {
-      return
-    }
+  if (!selectedCard) return
 
-    const { front90, back90, front45, back45 } = listingData.requiredPhotos
+  const photos = listingData.requiredPhotos
+  const { front90, back90, front45, back45 } = photos
 
-    if (!front90 || !back90 || !front45 || !back45) {
-      console.log('Envie as 4 fotos obrigatórias do item.')
-      return
-    }
+  if (!front90 || !back90 || !front45 || !back45) {
+    console.log('Envie as 4 fotos obrigatórias do item.')
+    return
+  }
 
+  try {
     const payload = {
       cardId: selectedCard.id,
       cardSnapshot: {
@@ -198,29 +200,33 @@ function NewListing() {
       listingData: {
         language: listingData.language,
         condition: listingData.condition,
-        price: Number(listingData.price),
-        quantity: Number(listingData.quantity),
+        price: Number(listingData.price || 0),
+        quantity: Number(listingData.quantity || 1),
         certified: listingData.certified === 'true',
-        gradingCompany: listingData.gradingCompany.trim(),
-        grade: listingData.grade.trim(),
+        gradingCompany: listingData.gradingCompany || '',
+        grade: listingData.grade || '',
         acceptsOffer: listingData.acceptsOffer,
-        description: listingData.description.trim(),
-        defects: listingData.defects.trim(),
+        description: listingData.description || '',
+        defects: listingData.defects || '',
         shippingAvailable: listingData.shippingAvailable,
         localPickup: listingData.localPickup,
-        city: listingData.city.trim(),
-        state: listingData.state.trim(),
-        requiredPhotos: {
-          front90,
-          back90,
-          front45,
-          back45,
-        },
+        city: listingData.city || '',
+        state: listingData.state || '',
+        requiredPhotos: photos,
       },
     }
 
-    console.log('Payload do anúncio:', payload)
+    const result = await createListingOnBackend(payload)
+
+    console.log('Anúncio criado:', result)
+
+    // opcional: redirecionar
+    // navigate('/dashboard')
+
+  } catch (err) {
+    console.error('Erro ao criar anúncio:', err)
   }
+}
 
   return (
     <div className="newListing">

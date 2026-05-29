@@ -1,6 +1,6 @@
 import { useState, useRef } from 'react'
 import { Link } from 'react-router-dom'
-import { useStore } from '../context/StoreContext'
+import { useStore } from '../hooks/useStore'
 
 const BANNER_MIN_WIDTH = 800
 const BANNER_MIN_HEIGHT = 200
