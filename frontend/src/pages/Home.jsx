@@ -48,7 +48,7 @@ function Home() {
           <SignedIn>
           <SignedIn>
             <Link
-              to={`/cart/${user?.id}`}
+               to="/cart"
                className="home__btn home__btn--secondary"
               >
           Carrinho

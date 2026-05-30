@@ -3,7 +3,7 @@ export const CARD_CONDITIONS = [
   { value: 'LP', label: 'Levemente jogada' },
   { value: 'MP', label: 'Moderadamente jogada' },
   { value: 'HP', label: 'Muito jogada' },
-  { value: 'DMG', label: 'Danificada' },
+  { value: 'DM', label: 'Danificada' },
 ]
 
 export const CARD_CONDITION_FILTER_OPTIONS = [

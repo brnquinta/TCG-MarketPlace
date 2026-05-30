@@ -117,6 +117,9 @@ export function StoreProvider({ children }) {
         listingFilters,
         setListingFilters,
 
+        hasListings: listings.length > 0,
+        isLoading: loading,
+
         // ⭐ ADICIONADO AQUI
         listings,
         addListing,

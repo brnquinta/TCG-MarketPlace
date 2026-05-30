@@ -6,12 +6,20 @@
   "type": "module",
   "scripts": {
     "start": "node src/app.js",
-    "dev": "nodemon src/app.js"
+    "dev": "nodemon src/app.js",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage"
   },
-  "keywords": ["tcg", "marketplace", "pokemon"],
+  "keywords": [
+    "tcg",
+    "marketplace",
+    "pokemon"
+  ],
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@clerk/clerk-sdk-node": "^4.13.23",
     "cors": "^2.8.5",
     "dotenv": "^16.3.1",
     "express": "^4.18.2",
@@ -21,6 +29,10 @@
     "morgan": "^1.10.0"
   },
   "devDependencies": {
-    "nodemon": "^3.0.2"
+    "@vitest/coverage-v8": "^4.1.7",
+    "mongodb-memory-server": "^11.2.0",
+    "nodemon": "^3.0.2",
+    "supertest": "^7.2.2",
+    "vitest": "^4.1.7"
   }
 }

@@ -1,0 +1,183 @@
+<mxfile host="app.diagrams.net" modified="2026-05-29T10:00:00.000Z" agent="TCG-MarketPlace" version="24.0.0">
+  <diagram id="casos-de-uso" name="Casos de Uso UML">
+    <mxGraphModel dx="1200" dy="800" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1600" pageHeight="1200" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <mxCell id="t" value="DIAGRAMA DE CASOS DE USO — TCG Marketplace" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;fontSize=18;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="500" y="20" width="600" height="40" as="geometry" />
+        </mxCell>
+
+        <!-- ============ ATORES ============ -->
+
+        <!-- Comprador -->
+        <mxCell id="actor-comprador" value="Comprador" style="ellipse;whiteSpace=wrap;html=1;fillColor=#BBDEFB;strokeColor=#1565C0;fontStyle=1;fontSize=14;" vertex="1" parent="1">
+          <mxGeometry x="80" y="180" width="130" height="50" as="geometry" />
+        </mxCell>
+
+        <!-- Vendedor -->
+        <mxCell id="actor-vendedor" value="Vendedor" style="ellipse;whiteSpace=wrap;html=1;fillColor=#C8E6C9;strokeColor=#2E7D32;fontStyle=1;fontSize=14;" vertex="1" parent="1">
+          <mxGeometry x="80" y="460" width="130" height="50" as="geometry" />
+        </mxCell>
+
+        <!-- Visitante -->
+        <mxCell id="actor-visitante" value="Visitante" style="ellipse;whiteSpace=wrap;html=1;fillColor=#E0E0E0;strokeColor=#616161;fontStyle=1;fontSize=14;" vertex="1" parent="1">
+          <mxGeometry x="80" y="700" width="130" height="50" as="geometry" />
+        </mxCell>
+
+        <!-- ============ SISTEMA (retângulo) ============ -->
+        <mxCell id="sistema" value="TCG Marketplace" style="rounded=1;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#333333;strokeWidth=2;fontSize=14;fontStyle=1;verticalAlign=top;align=center;" vertex="1" parent="1">
+          <mxGeometry x="320" y="100" width="1100" height="700" as="geometry" />
+        </mxCell>
+
+        <!-- ============ CASOS DE USO — COMPRADOR ============ -->
+
+        <mxCell id="uc-buscar" value="Buscar Cartas&#10;no Catálogo" style="ellipse;whiteSpace=wrap;html=1;fillColor=#E3F2FD;strokeColor=#1565C0;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="400" y="150" width="150" height="60" as="geometry" />
+        </mxCell>
+
+        <mxCell id="uc-ver-card" value="Ver Detalhes&#10;da Carta" style="ellipse;whiteSpace=wrap;html=1;fillColor=#E3F2FD;strokeColor=#1565C0;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="600" y="150" width="150" height="60" as="geometry" />
+        </mxCell>
+
+        <mxCell id="uc-listar" value="Listar&#10;Anúncios" style="ellipse;whiteSpace=wrap;html=1;fillColor=#E3F2FD;strokeColor=#1565C0;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="800" y="150" width="150" height="60" as="geometry" />
+        </mxCell>
+
+        <mxCell id="uc-ver-listing" value="Ver Detalhes&#10;do Anúncio" style="ellipse;whiteSpace=wrap;html=1;fillColor=#E3F2FD;strokeColor=#1565C0;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="1000" y="150" width="150" height="60" as="geometry" />
+        </mxCell>
+
+        <mxCell id="uc-carrinho" value="Gerenciar&#10;Carrinho" style="ellipse;whiteSpace=wrap;html=1;fillColor=#FFF9C4;strokeColor=#F9A825;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="600" y="280" width="150" height="60" as="geometry" />
+        </mxCell>
+
+        <mxCell id="uc-checkout" value="Finalizar&#10;Compra ❌" style="ellipse;whiteSpace=wrap;html=1;fillColor=#FFCDD2;strokeColor=#E53935;fontSize=12;dashed=1;" vertex="1" parent="1">
+          <mxGeometry x="800" y="280" width="150" height="60" as="geometry" />
+        </mxCell>
+
+        <mxCell id="uc-ver-loja" value="Visualizar&#10;Loja" style="ellipse;whiteSpace=wrap;html=1;fillColor=#E3F2FD;strokeColor=#1565C0;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="1000" y="280" width="150" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- ============ CASOS DE USO — VENDEDOR ============ -->
+
+        <mxCell id="uc-criar-loja" value="Criar Loja" style="ellipse;whiteSpace=wrap;html=1;fillColor=#E8F5E9;strokeColor=#2E7D32;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="400" y="430" width="150" height="60" as="geometry" />
+        </mxCell>
+
+        <mxCell id="uc-editar-loja" value="Editar Loja" style="ellipse;whiteSpace=wrap;html=1;fillColor=#E8F5E9;strokeColor=#2E7D32;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="600" y="430" width="150" height="60" as="geometry" />
+        </mxCell>
+
+        <mxCell id="uc-criar-listing" value="Criar&#10;Anúncio" style="ellipse;whiteSpace=wrap;html=1;fillColor=#E8F5E9;strokeColor=#2E7D32;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="800" y="430" width="150" height="60" as="geometry" />
+        </mxCell>
+
+        <mxCell id="uc-gerenciar" value="Gerenciar&#10;Anúncios" style="ellipse;whiteSpace=wrap;html=1;fillColor=#E8F5E9;strokeColor=#2E7D32;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="1000" y="430" width="150" height="60" as="geometry" />
+        </mxCell>
+
+        <mxCell id="uc-dashboard" value="Ver&#10;Dashboard" style="ellipse;whiteSpace=wrap;html=1;fillColor=#E8F5E9;strokeColor=#2E7D32;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="400" y="560" width="150" height="60" as="geometry" />
+        </mxCell>
+
+        <mxCell id="uc-onboarding" value="Completar&#10;Onboarding ❌" style="ellipse;whiteSpace=wrap;html=1;fillColor=#FFCDD2;strokeColor=#E53935;fontSize=12;dashed=1;" vertex="1" parent="1">
+          <mxGeometry x="600" y="560" width="150" height="60" as="geometry" />
+        </mxCell>
+
+        <mxCell id="uc-pedidos" value="Gerenciar&#10;Pedidos ❌" style="ellipse;whiteSpace=wrap;html=1;fillColor=#FFCDD2;strokeColor=#E53935;fontSize=12;dashed=1;" vertex="1" parent="1">
+          <mxGeometry x="800" y="560" width="150" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- ============ CASOS DE USO — VISITANTE ============ -->
+
+        <mxCell id="uc-login" value="Fazer Login /&#10;Cadastro" style="ellipse;whiteSpace=wrap;html=1;fillColor=#F5F5F5;strokeColor=#616161;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="600" y="690" width="150" height="60" as="geometry" />
+        </mxCell>
+
+        <mxCell id="uc-buscar-visitante" value="Buscar Cartas&#10;(público)" style="ellipse;whiteSpace=wrap;html=1;fillColor=#F5F5F5;strokeColor=#616161;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="800" y="690" width="150" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- ============ RELACIONAMENTOS COMPRADOR ============ -->
+        <mxCell id="r-c1" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#1565C0;strokeWidth=1;" edge="1" parent="1" source="actor-comprador" target="uc-buscar">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="r-c2" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#1565C0;strokeWidth=1;" edge="1" parent="1" source="actor-comprador" target="uc-ver-card">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="r-c3" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#1565C0;strokeWidth=1;" edge="1" parent="1" source="actor-comprador" target="uc-listar">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="r-c4" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#1565C0;strokeWidth=1;" edge="1" parent="1" source="actor-comprador" target="uc-ver-listing">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="r-c5" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#F9A825;strokeWidth=1;" edge="1" parent="1" source="actor-comprador" target="uc-carrinho">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="r-c6" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#E53935;strokeWidth=1;dashed=1;" edge="1" parent="1" source="actor-comprador" target="uc-checkout">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="r-c7" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#1565C0;strokeWidth=1;" edge="1" parent="1" source="actor-comprador" target="uc-ver-loja">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- ============ RELACIONAMENTOS VENDEDOR ============ -->
+        <mxCell id="r-v1" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#2E7D32;strokeWidth=1;" edge="1" parent="1" source="actor-vendedor" target="uc-criar-loja">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="r-v2" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#2E7D32;strokeWidth=1;" edge="1" parent="1" source="actor-vendedor" target="uc-editar-loja">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="r-v3" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#2E7D32;strokeWidth=1;" edge="1" parent="1" source="actor-vendedor" target="uc-criar-listing">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="r-v4" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#2E7D32;strokeWidth=1;" edge="1" parent="1" source="actor-vendedor" target="uc-gerenciar">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="r-v5" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#2E7D32;strokeWidth=1;" edge="1" parent="1" source="actor-vendedor" target="uc-dashboard">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="r-v6" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#E53935;strokeWidth=1;dashed=1;" edge="1" parent="1" source="actor-vendedor" target="uc-onboarding">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="r-v7" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#E53935;strokeWidth=1;dashed=1;" edge="1" parent="1" source="actor-vendedor" target="uc-pedidos">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- ============ RELACIONAMENTOS VISITANTE ============ -->
+        <mxCell id="r-vi1" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#616161;strokeWidth=1;" edge="1" parent="1" source="actor-visitante" target="uc-login">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="r-vi2" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#616161;strokeWidth=1;" edge="1" parent="1" source="actor-visitante" target="uc-buscar-visitante">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- ============ INCLUDE (UC extends) ============ -->
+        <mxCell id="inc1" value="&lt;&lt;include&gt;&gt;" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#333;strokeWidth=1;dashed=1;fontSize=11;" edge="1" parent="1" source="uc-criar-listing" target="uc-buscar">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="550" y="350" as="offset" />
+          </mxGeometry>
+        </mxCell>
+
+        <mxCell id="inc2" value="&lt;&lt;include&gt;&gt;" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#333;strokeWidth=1;dashed=1;fontSize=11;" edge="1" parent="1" source="uc-criar-listing" target="uc-ver-card">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- ============ LEGENDA ============ -->
+        <mxCell id="leg1" value="✅ Implementado" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#C8E6C9;strokeColor=#2E7D32;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="1220" y="150" width="140" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="leg2" value="⚠️ Parcial / Bug" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFF9C4;strokeColor=#F9A825;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="1220" y="200" width="140" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="leg3" value="❌ Não implementado" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFCDD2;strokeColor=#E53935;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="1220" y="250" width="140" height="30" as="geometry" />
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

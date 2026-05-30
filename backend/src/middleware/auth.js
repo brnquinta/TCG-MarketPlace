@@ -1,7 +1,27 @@
-import jwt from 'jsonwebtoken'
+import { verifyToken } from '@clerk/clerk-sdk-node'
 import User from '../models/User.js'
 
-const CLERK_PUBLIC_KEY = process.env.CLERK_SECRET_KEY
+const buildUser = async (payload) => {
+  const clerkId = payload.sub
+  let user = await User.findOne({ clerkId })
+
+  if (!user) {
+    user = new User({
+      clerkId,
+      email: payload.email || `${clerkId}@temp.local`,
+      firstName: payload.first_name || '',
+      lastName: payload.last_name || ''
+    })
+    await user.save()
+    console.log(`Usuario criado automaticamente: ${clerkId}`)
+  }
+
+  return {
+    clerkId,
+    email: user.email,
+    id: user._id
+  }
+}
 
 export const authenticateToken = async (req, res, next) => {
   try {
@@ -12,38 +32,12 @@ export const authenticateToken = async (req, res, next) => {
     }
 
     const token = authHeader.split(' ')[1]
+    const payload = await verifyToken(token, { secretKey: process.env.CLERK_SECRET_KEY })
 
-    const decoded = jwt.decode(token, { complete: true })
-    
-    if (!decoded) {
-      return res.status(401).json({ error: 'Invalid token' })
-    }
-
-    const payload = decoded.payload
-    const clerkId = payload.sub || payload._id
-    
-    let user = await User.findOne({ clerkId })
-    
-    if (!user) {
-      user = new User({
-        clerkId,
-        email: payload.email || `${clerkId}@temp.local`,
-        firstName: payload.first_name || '',
-        lastName: payload.last_name || ''
-      })
-      await user.save()
-      console.log(`Usuario criado automaticamente: ${clerkId}`)
-    }
-
-    req.user = {
-      clerkId,
-      email: user.email,
-      id: user._id
-    }
-
+    req.user = await buildUser(payload)
     next()
   } catch (error) {
-    console.error('Auth error:', error)
+    console.error('Auth error:', error.message)
     return res.status(401).json({ error: 'Unauthorized' })
   }
 }
@@ -54,19 +48,17 @@ export const optionalAuth = async (req, res, next) => {
 
     if (authHeader && authHeader.startsWith('Bearer ')) {
       const token = authHeader.split(' ')[1]
-      const decoded = jwt.decode(token, { complete: true })
-      
-      if (decoded) {
-        const payload = decoded.payload
-        req.user = {
-          clerkId: payload.sub || payload._id,
-          email: payload.email
-        }
+      const payload = await verifyToken(token, { secretKey: process.env.CLERK_SECRET_KEY })
+
+      req.user = {
+        clerkId: payload.sub,
+        email: payload.email
       }
     }
 
     next()
   } catch (error) {
+    console.error('optionalAuth: token verification failed:', error.message)
     next()
   }
 }

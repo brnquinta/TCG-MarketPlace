@@ -1,0 +1,258 @@
+<mxfile host="app.diagrams.net" modified="2026-05-29T10:00:00.000Z" agent="TCG-MarketPlace" version="24.0.0">
+  <diagram id="horizontal-jornada" name="Jornada do Usuário">
+    <mxGraphModel dx="1200" dy="800" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="2000" pageHeight="1200" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <!-- TÍTULO PRINCIPAL -->
+        <mxCell id="t0" value="JORNADA DO USUÁRIO — TCG Marketplace" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;fontSize=20;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="40" y="10" width="1800" height="40" as="geometry" />
+        </mxCell>
+
+        <!-- ============================================ -->
+        <!-- LINHA 1: JORNADA DO COMPRADOR (VISITANTE) -->
+        <!-- ============================================ -->
+
+        <!-- Label da linha -->
+        <mxCell id="l1" value="COMPRADOR" style="text;html=1;strokeColor=none;fillColor=#E3F2FD;align=center;verticalAlign=middle;whiteSpace=wrap;fontSize=14;fontStyle=1;rounded=1;" vertex="1" parent="1">
+          <mxGeometry x="40" y="70" width="160" height="40" as="geometry" />
+        </mxCell>
+
+        <!-- 1. Visitante -->
+        <mxCell id="c1" value="Visitante" style="ellipse;whiteSpace=wrap;html=1;fillColor=#BBDEFB;strokeColor=#1565C0;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="260" y="60" width="120" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- Seta 1→2 -->
+        <mxCell id="s1-2" value="Acessa" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#1565C0;" edge="1" parent="1" source="c1" target="c2">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- 2. Home Page -->
+        <mxCell id="c2" value="Home / Landing Page" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E3F2FD;strokeColor=#1565C0;" vertex="1" parent="1">
+          <mxGeometry x="440" y="55" width="140" height="70" as="geometry" />
+        </mxCell>
+
+        <!-- Seta 2→3 -->
+        <mxCell id="s2-3" value="Buscar cartas" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#1565C0;" edge="1" parent="1" source="c2" target="c3">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- 3. Busca de Cartas -->
+        <mxCell id="c3" value="Busca de Cartas&#10;(filtros: nome, nº, set, raridade)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E3F2FD;strokeColor=#1565C0;" vertex="1" parent="1">
+          <mxGeometry x="640" y="55" width="150" height="70" as="geometry" />
+        </mxCell>
+
+        <!-- Seta 3→4 -->
+        <mxCell id="s3-4" value="Ver detalhes" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#1565C0;" edge="1" parent="1" source="c3" target="c4">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- 4. Card Detail -->
+        <mxCell id="c4" value="Card Detail&#10;(preços ref. BRL, info)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E3F2FD;strokeColor=#1565C0;" vertex="1" parent="1">
+          <mxGeometry x="850" y="55" width="140" height="70" as="geometry" />
+        </mxCell>
+
+        <!-- Seta 4→5 -->
+        <mxCell id="s4-5" value="Ver anúncios" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#1565C0;" edge="1" parent="1" source="c4" target="c5">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- 5. Anúncios -->
+        <mxCell id="c5" value="Anúncios&#10;(filtros: preço, condição, etc)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E3F2FD;strokeColor=#1565C0;" vertex="1" parent="1">
+          <mxGeometry x="1050" y="55" width="140" height="70" as="geometry" />
+        </mxCell>
+
+        <!-- Seta 5→6 -->
+        <mxCell id="s5-6" value="Detalhes" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#1565C0;" edge="1" parent="1" source="c5" target="c6">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- 6. Listing Detail -->
+        <mxCell id="c6" value="Listing Detail&#10;(fotos, descrição, add cart)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E3F2FD;strokeColor=#1565C0;" vertex="1" parent="1">
+          <mxGeometry x="1250" y="55" width="140" height="70" as="geometry" />
+        </mxCell>
+
+        <!-- Seta 6→7 -->
+        <mxCell id="s6-7" value="Adicionar" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#1565C0;" edge="1" parent="1" source="c6" target="c7">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- 7. Carrinho -->
+        <mxCell id="c7" value="Carrinho&#10;(agrupado por loja)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF9C4;strokeColor=#F9A825;" vertex="1" parent="1">
+          <mxGeometry x="1450" y="55" width="140" height="70" as="geometry" />
+        </mxCell>
+
+        <!-- Seta 7→8 -->
+        <mxCell id="s7-8" value="Finalizar" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#F9A825;dashed=1;" edge="1" parent="1" source="c7" target="c8">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- 8. Checkout (stub) -->
+        <mxCell id="c8" value="Checkout&#10;❌ STUB" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFCDD2;strokeColor=#E53935;dashed=1;" vertex="1" parent="1">
+          <mxGeometry x="1650" y="55" width="140" height="70" as="geometry" />
+        </mxCell>
+
+        <!-- Seta 8→9 -->
+        <mxCell id="s8-9" value="Confirmar" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#E53935;dashed=1;" edge="1" parent="1" source="c8" target="c9">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- 9. Pedido (futuro) -->
+        <mxCell id="c9" value="Pedido&#10;❌ FUTURO" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFCDD2;strokeColor=#E53935;dashed=1;" vertex="1" parent="1">
+          <mxGeometry x="1850" y="55" width="140" height="70" as="geometry" />
+        </mxCell>
+
+        <!-- ============================================ -->
+        <!-- LINHA 2: JORNADA DO VENDEDOR -->
+        <!-- ============================================ -->
+
+        <!-- Label da linha -->
+        <mxCell id="l2" value="VENDEDOR" style="text;html=1;strokeColor=none;fillColor=#E8F5E9;align=center;verticalAlign=middle;whiteSpace=wrap;fontSize=14;fontStyle=1;rounded=1;" vertex="1" parent="1">
+          <mxGeometry x="40" y="190" width="160" height="40" as="geometry" />
+        </mxCell>
+
+        <!-- V1. Login -->
+        <mxCell id="v1" value="Login /&#10;Criar Conta" style="ellipse;whiteSpace=wrap;html=1;fillColor=#C8E6C9;strokeColor=#2E7D32;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="260" y="180" width="120" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- Seta V1→V2 -->
+        <mxCell id="sv1-2" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#2E7D32;" edge="1" parent="1" source="v1" target="v2">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- V2. Sincronizar -->
+        <mxCell id="v2" value="Sincronizar&#10;(Clerk → MongoDB)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E8F5E9;strokeColor=#2E7D32;" vertex="1" parent="1">
+          <mxGeometry x="440" y="175" width="140" height="70" as="geometry" />
+        </mxCell>
+
+        <!-- Seta V2→V3 -->
+        <mxCell id="sv2-3" value="Criar loja" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#2E7D32;" edge="1" parent="1" source="v2" target="v3">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- V3. Criar Loja -->
+        <mxCell id="v3" value="Criar Loja&#10;(nome, slug, localização)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E8F5E9;strokeColor=#2E7D32;" vertex="1" parent="1">
+          <mxGeometry x="640" y="175" width="140" height="70" as="geometry" />
+        </mxCell>
+
+        <!-- Seta V3→V4 -->
+        <mxCell id="sv3-4" value="Gerenciar" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#2E7D32;" edge="1" parent="1" source="v3" target="v4">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- V4. Dashboard -->
+        <mxCell id="v4" value="Dashboard&#10;(estatísticas, próximos passos)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E8F5E9;strokeColor=#2E7D32;" vertex="1" parent="1">
+          <mxGeometry x="840" y="175" width="140" height="70" as="geometry" />
+        </mxCell>
+
+        <!-- Seta V4→V5 -->
+        <mxCell id="sv4-5" value="Criar anúncio" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#2E7D32;" edge="1" parent="1" source="v4" target="v5">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- V5. Novo Anúncio -->
+        <mxCell id="v5" value="Novo Anúncio&#10;(buscar carta, fotos, dados)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E8F5E9;strokeColor=#2E7D32;" vertex="1" parent="1">
+          <mxGeometry x="1040" y="175" width="150" height="70" as="geometry" />
+        </mxCell>
+
+        <!-- Seta V5→V6 -->
+        <mxCell id="sv5-6" value="Ativo" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#2E7D32;" edge="1" parent="1" source="v5" target="v6">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- V6. Anúncio Ativo -->
+        <mxCell id="v6" value="Anúncio Ativo&#10;(visível na busca)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#C8E6C9;strokeColor=#2E7D32;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="1250" y="175" width="140" height="70" as="geometry" />
+        </mxCell>
+
+        <!-- Seta V6→V7 -->
+        <mxCell id="sv6-7" value="Receber pedido" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#E53935;dashed=1;" edge="1" parent="1" source="v6" target="v7">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- V7. Gerenciar Pedido (futuro) -->
+        <mxCell id="v7" value="Gerenciar Pedido&#10;❌ FUTURO" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFCDD2;strokeColor=#E53935;dashed=1;" vertex="1" parent="1">
+          <mxGeometry x="1450" y="175" width="140" height="70" as="geometry" />
+        </mxCell>
+
+        <!-- ============================================ -->
+        <!-- LINHA 3: FLUXO DE DADOS / SISTEMA -->
+        <!-- ============================================ -->
+
+        <mxCell id="l3" value="SISTEMA" style="text;html=1;strokeColor=none;fillColor=#F3E5F5;align=center;verticalAlign=middle;whiteSpace=wrap;fontSize=14;fontStyle=1;rounded=1;" vertex="1" parent="1">
+          <mxGeometry x="40" y="310" width="160" height="40" as="geometry" />
+        </mxCell>
+
+        <!-- S1. Frontend React -->
+        <mxCell id="s1" value="Frontend&#10;(React 19 + Vite)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F3E5F5;strokeColor=#7B1FA2;" vertex="1" parent="1">
+          <mxGeometry x="260" y="300" width="130" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- S2. Clerk Auth -->
+        <mxCell id="s2" value="Clerk Auth&#10;(JWT)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F3E5F5;strokeColor=#7B1FA2;" vertex="1" parent="1">
+          <mxGeometry x="440" y="300" width="130" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- S3. Express API -->
+        <mxCell id="s3" value="Express API&#10;(porta 3001)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F3E5F5;strokeColor=#7B1FA2;" vertex="1" parent="1">
+          <mxGeometry x="620" y="300" width="130" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- S4. MongoDB -->
+        <mxCell id="s4" value="MongoDB&#10;(5 coleções)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F3E5F5;strokeColor=#7B1FA2;" vertex="1" parent="1">
+          <mxGeometry x="800" y="300" width="130" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- S5. TCG Proxy -->
+        <mxCell id="s5" value="Pokémon TCG&#10;Proxy (JSON)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F3E5F5;strokeColor=#7B1FA2;" vertex="1" parent="1">
+          <mxGeometry x="980" y="300" width="130" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- S6. AwesomeAPI -->
+        <mxCell id="s6" value="AwesomeAPI&#10;(USD→BRL)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F3E5F5;strokeColor=#7B1FA2;" vertex="1" parent="1">
+          <mxGeometry x="1160" y="300" width="130" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- Setas sistema -->
+        <mxCell id="ss1-2" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#7B1FA2;" edge="1" parent="1" source="s1" target="s2">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ss2-3" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#7B1FA2;" edge="1" parent="1" source="s2" target="s3">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ss3-4" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#7B1FA2;" edge="1" parent="1" source="s3" target="s4">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ss3-5" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#7B1FA2;" edge="1" parent="1" source="s3" target="s5">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ss3-6" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#7B1FA2;" edge="1" parent="1" source="s3" target="s6">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- ============================================ -->
+        <!-- LEGENDA -->
+        <!-- ============================================ -->
+        <mxCell id="legenda" value="LEGENDA" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;fontSize=14;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="40" y="420" width="100" height="30" as="geometry" />
+        </mxCell>
+
+        <mxCell id="leg-ok" value="✅ Implementado" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#C8E6C9;strokeColor=#2E7D32;" vertex="1" parent="1">
+          <mxGeometry x="40" y="460" width="140" height="30" as="geometry" />
+        </mxCell>
+
+        <mxCell id="leg-warn" value="⚠️ Parcial / Bug" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFF9C4;strokeColor=#F9A825;" vertex="1" parent="1">
+          <mxGeometry x="210" y="460" width="140" height="30" as="geometry" />
+        </mxCell>
+
+        <mxCell id="leg-fail" value="❌ Não implementado" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFCDD2;strokeColor=#E53935;" vertex="1" parent="1">
+          <mxGeometry x="380" y="460" width="140" height="30" as="geometry" />
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
