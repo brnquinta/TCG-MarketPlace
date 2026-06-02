@@ -32,6 +32,12 @@ backend/dist
 frontend/build
 
 # =========================
+# UPLOADS
+# =========================
+uploads
+backend/uploads
+
+# =========================
 # OS FILES
 # =========================
 .DS_Store

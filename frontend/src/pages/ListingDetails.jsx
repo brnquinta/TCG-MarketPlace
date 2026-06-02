@@ -43,7 +43,12 @@ function ListingDetails() {
   const listingData = listing.listingData
   const store = listing.storeId
 
-  const photosArray = listing.photos ? Object.values(listing.photos).filter(Boolean) : []
+  const API_BASE = API_URL.replace(/\/api$/, '')
+  const photosArray = listing.photos
+    ? Object.values(listing.photos)
+        .filter(Boolean)
+        .map((url) => url.startsWith('http') ? url : `${API_BASE}${url}`)
+    : []
 
   const nextPhoto = () => {
     setCurrentPhoto((prev) =>
@@ -167,6 +172,7 @@ function ListingDetails() {
             <img
               src={photosArray[currentPhoto]}
               className="listing-details__carousel-image"
+              alt="Foto do item"
             />
 
             <button
@@ -184,7 +190,7 @@ function ListingDetails() {
         </div>
       )}
 
-      {/* ===== DESCRIÇÃO ===== */}
+      {/* ===== DESCRICAO ===== */}
       <div className="listing-details__section">
 
         <div className="listing-details__section-header">
@@ -240,7 +246,9 @@ function ListingDetails() {
           </p>
 
           <p className="listing-details__store-rating">
-            {store.rating ? `Nota: ${store.rating}` : 'Sem avaliacao'}
+            {store.rating && store.rating.average > 0
+              ? `Nota: ${store.rating.average.toFixed(1)} (${store.rating.reviewsCount} avaliacoes)`
+              : 'Sem avaliacao'}
           </p>
 
         </div>

@@ -3,6 +3,7 @@ import useCardSearch from '../hooks/useCardSearch'
 import { CARD_CONDITIONS } from '../../utils/cardConditions'
 import { CARD_LANGUAGE_FORM_OPTIONS } from '../../utils/cardLanguages'
 import { useApiStore } from '../hooks/useApiStore'
+import { uploadAPI } from '../services/api'
 import { useNavigate } from 'react-router-dom'
 
 const PHOTO_STEPS = [
@@ -35,6 +36,7 @@ const PHOTO_STEPS = [
 function NewListing() {
   const navigate = useNavigate()
   const { createListingOnBackend } = useApiStore()
+
   const [listingData, setListingData] = useState({
     language: '',
     condition: '',
@@ -50,22 +52,27 @@ function NewListing() {
     localPickup: false,
     city: '',
     state: '',
-    requiredPhotos: {
-      front90: null,
-      back90: null,
-      front45: null,
-      back45: null,
-    },
   })
 
   const [selectedCard, setSelectedCard] = useState(null)
+
+  const [requiredPhotos, setRequiredPhotos] = useState({
+    front90: null,
+    back90: null,
+    front45: null,
+    back45: null,
+  })
+
   const [photoPreviews, setPhotoPreviews] = useState({
     front90: '',
     back90: '',
     front45: '',
     back45: '',
   })
+
   const [activePhotoStep, setActivePhotoStep] = useState(0)
+  const [uploading, setUploading] = useState(false)
+  const [uploadProgress, setUploadProgress] = useState('')
 
   const {
     filters,
@@ -88,18 +95,17 @@ function NewListing() {
   } = useCardSearch()
 
   const currentPhotoStep = PHOTO_STEPS[activePhotoStep]
-  const currentPhotoFile = listingData.requiredPhotos[currentPhotoStep.key]
+  const currentPhotoFile = requiredPhotos[currentPhotoStep.key]
   const currentPhotoPreview = photoPreviews[currentPhotoStep.key]
 
   const completedPhotoSteps = useMemo(() => {
-    return PHOTO_STEPS.filter((step) => listingData.requiredPhotos[step.key]).length
-  }, [listingData.requiredPhotos])
+    return PHOTO_STEPS.filter((step) => requiredPhotos[step.key]).length
+  }, [requiredPhotos])
 
   const allPhotosSent = completedPhotoSteps === PHOTO_STEPS.length
 
   const handleListingChange = (e) => {
     const { name, value, type, checked } = e.target
-
     setListingData((prev) => ({
       ...prev,
       [name]: type === 'checkbox' ? checked : value,
@@ -110,12 +116,9 @@ function NewListing() {
     const { name, files } = e.target
     const file = files?.[0] || null
 
-    setListingData((prev) => ({
+    setRequiredPhotos((prev) => ({
       ...prev,
-      requiredPhotos: {
-        ...prev.requiredPhotos,
-        [name]: file,
-      },
+      [name]: file,
     }))
 
     setPhotoPreviews((prev) => ({
@@ -125,12 +128,9 @@ function NewListing() {
   }
 
   const handleRemoveRequiredPhoto = (photoKey) => {
-    setListingData((prev) => ({
+    setRequiredPhotos((prev) => ({
       ...prev,
-      requiredPhotos: {
-        ...prev.requiredPhotos,
-        [photoKey]: null,
-      },
+      [photoKey]: null,
     }))
 
     setPhotoPreviews((prev) => ({
@@ -162,80 +162,86 @@ function NewListing() {
     setSelectedCard(null)
   }
 
-  const handleSelectCard = (card) => {
-    setSelectedCard(card)
-  }
+  const handleSelectCard = (card) => setSelectedCard(card)
+  const handleRemoveSelectedCard = () => setSelectedCard(null)
 
-  const handleRemoveSelectedCard = () => {
-    setSelectedCard(null)
-  }
+  const handleCreate = async (e) => {
+    e.preventDefault()
 
-const handleCreate = async (e) => {
-  e.preventDefault()
+    if (!selectedCard) return
 
-  if (!selectedCard) return
+    const { front90, back90, front45, back45 } = requiredPhotos
 
-  const photos = listingData.requiredPhotos
-  const { front90, back90, front45, back45 } = photos
-
-  if (!front90 || !back90 || !front45 || !back45) {
-    console.log('Envie as 4 fotos obrigatórias do item.')
-    return
-  }
-
-  try {
-    const payload = {
-      cardId: selectedCard.id,
-      cardSnapshot: {
-        name: selectedCard.name || '',
-        number: selectedCard.number || '',
-        rarity: selectedCard.rarity || '',
-        supertype: selectedCard.supertype || '',
-        subtypes: selectedCard.subtypes || [],
-        imageSmall: selectedCard.images?.small || '',
-        imageLarge: selectedCard.images?.large || '',
-        setId: selectedCard.set?.id || '',
-        setName: selectedCard.set?.name || '',
-        setSeries: selectedCard.set?.series || '',
-        setReleaseDate: selectedCard.set?.releaseDate || '',
-      },
-      listingData: {
-        language: listingData.language,
-        condition: listingData.condition,
-        price: Number(listingData.price || 0),
-        quantity: Number(listingData.quantity || 1),
-        certified: listingData.certified === 'true',
-        gradingCompany: listingData.gradingCompany || '',
-        grade: listingData.grade || '',
-        acceptsOffer: listingData.acceptsOffer,
-        description: listingData.description || '',
-        defects: listingData.defects || '',
-        shippingAvailable: listingData.shippingAvailable,
-        localPickup: listingData.localPickup,
-        city: listingData.city || '',
-        state: listingData.state || '',
-        requiredPhotos: photos,
-      },
-    }
-
-    const result = await createListingOnBackend(payload)
-
-    console.log('🔥 RESULT FINAL:', result)
-
-    const id = result?._id
-
-    if (!id) {
-      console.error('❌ ID não encontrado no resultado:', result)
+    if (!front90 || !back90 || !front45 || !back45) {
+      alert('Envie as 4 fotos obrigatórias do item.')
       return
     }
 
-    // 👇 AGORA SIM FUNCIONA
-    navigate(`/listing/${id}`)
+    try {
+      setUploading(true)
+      setUploadProgress('Enviando fotos...')
 
-  } catch (err) {
-    console.error('Erro ao criar anúncio:', err)
+      const formData = new FormData()
+      formData.append('front90', front90)
+      formData.append('back90', back90)
+      formData.append('front45', front45)
+      formData.append('back45', back45)
+
+      const uploadedPhotos = await uploadAPI.uploadListingPhotos(formData)
+
+      setUploadProgress('Criando anúncio...')
+
+      const payload = {
+        cardId: selectedCard.id,
+        cardSnapshot: {
+          name: selectedCard.name || '',
+          number: selectedCard.number || '',
+          rarity: selectedCard.rarity || '',
+          supertype: selectedCard.supertype || '',
+          subtypes: selectedCard.subtypes || [],
+          imageSmall: selectedCard.images?.small || '',
+          imageLarge: selectedCard.images?.large || '',
+          setId: selectedCard.set?.id || '',
+          setName: selectedCard.set?.name || '',
+          setSeries: selectedCard.set?.series || '',
+          setReleaseDate: selectedCard.set?.releaseDate || '',
+        },
+        listingData: {
+          language: listingData.language,
+          condition: listingData.condition,
+          price: Number(listingData.price || 0),
+          quantity: Number(listingData.quantity || 1),
+          certified: listingData.certified === 'true',
+          gradingCompany: listingData.gradingCompany || '',
+          grade: listingData.grade || '',
+          acceptsOffer: listingData.acceptsOffer,
+          description: listingData.description || '',
+          defects: listingData.defects || '',
+          shippingAvailable: listingData.shippingAvailable,
+          localPickup: listingData.localPickup,
+          city: listingData.city || '',
+          state: listingData.state || '',
+        },
+        photos: uploadedPhotos,
+      }
+
+      const result = await createListingOnBackend(payload)
+      const id = result?._id
+
+      if (!id) {
+        console.error('ID não encontrado no resultado:', result)
+        return
+      }
+
+      navigate(`/listing/${id}`)
+    } catch (err) {
+      console.error('Erro ao criar anúncio:', err)
+      alert('Erro ao criar anúncio. Tente novamente.')
+    } finally {
+      setUploading(false)
+      setUploadProgress('')
+    }
   }
-}
 
   return (
     <div className="newListing">
@@ -243,6 +249,8 @@ const handleCreate = async (e) => {
         <div className="newListing__main">
           <form className="newListing__form" onSubmit={handleCreate}>
             <div className="newListing__container">
+
+              {/* ===== 1. SELECIONAR CARTA ===== */}
               <section className="newListing__section">
                 <h2 className="newListing__section-title">Selecionar carta</h2>
 
@@ -408,6 +416,7 @@ const handleCreate = async (e) => {
                 </div>
               </section>
 
+              {/* ===== 2. CARTA SELECIONADA ===== */}
               {selectedCard && (
                 <section className="newListing__section">
                   <div className="newListing__section-header">
@@ -496,325 +505,328 @@ const handleCreate = async (e) => {
                 </section>
               )}
 
-              <section className="newListing__section">
-                <h2 className="newListing__section-title">Dados do anúncio</h2>
+              {/* ===== 3. DADOS DO ANUNCIO (inclui stepper de fotos) ===== */}
+              {selectedCard && (
+                <section className="newListing__section">
+                  <h2 className="newListing__section-title">Dados do anúncio</h2>
 
-                <div className="newListing__fields">
-                  <div className="newListing__field-group">
-                    <label className="newListing__label" htmlFor="language">
-                      Idioma
-                    </label>
-                    <select
-                      id="language"
-                      className="newListing__select"
-                      name="language"
-                      value={listingData.language}
-                      onChange={handleListingChange}
-                    >
-                      {CARD_LANGUAGE_FORM_OPTIONS.map((language) => (
-                        <option
-                          key={language.value || 'placeholder'}
-                          value={language.value}
-                        >
-                          {language.label}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-
-                  <div className="newListing__field-group">
-                    <label className="newListing__label" htmlFor="condition">
-                      Condição
-                    </label>
-                    <select
-                      id="condition"
-                      className="newListing__select"
-                      name="condition"
-                      value={listingData.condition}
-                      onChange={handleListingChange}
-                    >
-                      <option value="">Selecione</option>
-                      {CARD_CONDITIONS.map((condition) => (
-                        <option key={condition.value} value={condition.value}>
-                          {condition.label}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-
-                  <div className="newListing__field-group">
-                    <label className="newListing__label" htmlFor="price">
-                      Preço
-                    </label>
-                    <input
-                      id="price"
-                      className="newListing__input"
-                      type="number"
-                      name="price"
-                      min="0"
-                      step="0.01"
-                      placeholder="Ex.: 199.90"
-                      value={listingData.price}
-                      onChange={handleListingChange}
-                    />
-                  </div>
-
-                  <div className="newListing__field-group">
-                    <label className="newListing__label" htmlFor="quantity">
-                      Quantidade
-                    </label>
-                    <input
-                      id="quantity"
-                      className="newListing__input"
-                      type="number"
-                      name="quantity"
-                      min="1"
-                      value={listingData.quantity}
-                      onChange={handleListingChange}
-                    />
-                  </div>
-
-                  <div className="newListing__field-group">
-                    <label className="newListing__label" htmlFor="certified">
-                      Certificada
-                    </label>
-                    <select
-                      id="certified"
-                      className="newListing__select"
-                      name="certified"
-                      value={listingData.certified}
-                      onChange={handleListingChange}
-                    >
-                      <option value="">Selecione</option>
-                      <option value="true">Sim</option>
-                      <option value="false">Não</option>
-                    </select>
-                  </div>
-
-                  <div className="newListing__field-group">
-                    <label className="newListing__label" htmlFor="gradingCompany">
-                      Empresa de certificação
-                    </label>
-                    <input
-                      id="gradingCompany"
-                      className="newListing__input"
-                      type="text"
-                      name="gradingCompany"
-                      placeholder="Ex.: PSA"
-                      value={listingData.gradingCompany}
-                      onChange={handleListingChange}
-                    />
-                  </div>
-
-                  <div className="newListing__field-group">
-                    <label className="newListing__label" htmlFor="grade">
-                      Nota
-                    </label>
-                    <input
-                      id="grade"
-                      className="newListing__input"
-                      type="text"
-                      name="grade"
-                      placeholder="Ex.: 10"
-                      value={listingData.grade}
-                      onChange={handleListingChange}
-                    />
-                  </div>
-
-                  <div className="newListing__field-group">
-                    <label className="newListing__label" htmlFor="city">
-                      Cidade
-                    </label>
-                    <input
-                      id="city"
-                      className="newListing__input"
-                      type="text"
-                      name="city"
-                      placeholder="Cidade"
-                      value={listingData.city}
-                      onChange={handleListingChange}
-                    />
-                  </div>
-
-                  <div className="newListing__field-group">
-                    <label className="newListing__label" htmlFor="state">
-                      Estado
-                    </label>
-                    <input
-                      id="state"
-                      className="newListing__input"
-                      type="text"
-                      name="state"
-                      placeholder="Estado"
-                      value={listingData.state}
-                      onChange={handleListingChange}
-                    />
-                  </div>
-
-                  <div className="newListing__field-group newListing__field-group--full">
-                    <label className="newListing__label" htmlFor="description">
-                      Descrição
-                    </label>
-                    <textarea
-                      id="description"
-                      className="newListing__textarea"
-                      name="description"
-                      placeholder="Descreva o anúncio"
-                      value={listingData.description}
-                      onChange={handleListingChange}
-                    />
-                  </div>
-
-                  <div className="newListing__field-group newListing__field-group--full">
-                    <label className="newListing__label" htmlFor="defects">
-                      Defeitos ou observações
-                    </label>
-                    <textarea
-                      id="defects"
-                      className="newListing__textarea"
-                      name="defects"
-                      placeholder="Informe riscos, whitening, marcas, etc."
-                      value={listingData.defects}
-                      onChange={handleListingChange}
-                    />
-                  </div>
-
-                  <div className="newListing__field-group newListing__field-group--full">
-                    <label className="newListing__label">
-                      Fotos obrigatórias do item
-                    </label>
-
-                    <p className="newListing__helper">
-                      Envie uma foto por etapa. Isso reduz a altura da tela e guia
-                      o seller no fluxo correto.
-                    </p>
-
-                    <div className="newListing__stepper">
-                      <div className="newListing__stepper-progress">
-                        <div className="newListing__stepper-track" />
-
-                        {PHOTO_STEPS.map((step, index) => {
-                          const isCompleted = Boolean(
-                            listingData.requiredPhotos[step.key]
-                          )
-                          const isActive = activePhotoStep === index
-
-                          return (
-                            <button
-                              key={step.key}
-                              type="button"
-                              className={`newListing__stepper-dot ${
-                                isActive ? 'newListing__stepper-dot--active' : ''
-                              } ${
-                                isCompleted
-                                  ? 'newListing__stepper-dot--completed'
-                                  : ''
-                              }`}
-                              onClick={() => handleGoToPhotoStep(index)}
-                            >
-                              <span className="newListing__stepper-dot-number">
-                                {index + 1}
-                              </span>
-                              <span className="newListing__stepper-dot-label">
-                                {step.title}
-                              </span>
-                            </button>
-                          )
-                        })}
-                      </div>
-
-                      <div className="newListing__stepper-summary">
-                        <span className="newListing__stepper-summary-text">
-                          {completedPhotoSteps} de {PHOTO_STEPS.length} fotos enviadas
-                        </span>
-                      </div>
-
-                      <div className="newListing__stepper-card">
-                        <div className="newListing__photo-step-header">
-                          <div className="newListing__stepper-card-title-wrap">
-                            <p className="newListing__stepper-card-step">
-                              Etapa {activePhotoStep + 1}
-                            </p>
-                            <h3 className="newListing__stepper-card-title">
-                              {currentPhotoStep.title}
-                            </h3>
-                          </div>
-
-                          <span
-                            className={`newListing__photo-status ${
-                              currentPhotoFile
-                                ? 'newListing__photo-status--sent'
-                                : 'newListing__photo-status--pending'
-                            }`}
+                  <div className="newListing__fields">
+                    <div className="newListing__field-group">
+                      <label className="newListing__label" htmlFor="language">
+                        Idioma
+                      </label>
+                      <select
+                        id="language"
+                        className="newListing__select"
+                        name="language"
+                        value={listingData.language}
+                        onChange={handleListingChange}
+                      >
+                        {CARD_LANGUAGE_FORM_OPTIONS.map((language) => (
+                          <option
+                            key={language.value || 'placeholder'}
+                            value={language.value}
                           >
-                            {getPhotoStatus(currentPhotoFile)}
+                            {language.label}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+
+                    <div className="newListing__field-group">
+                      <label className="newListing__label" htmlFor="condition">
+                        Condição
+                      </label>
+                      <select
+                        id="condition"
+                        className="newListing__select"
+                        name="condition"
+                        value={listingData.condition}
+                        onChange={handleListingChange}
+                      >
+                        <option value="">Selecione</option>
+                        {CARD_CONDITIONS.map((condition) => (
+                          <option key={condition.value} value={condition.value}>
+                            {condition.label}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+
+                    <div className="newListing__field-group">
+                      <label className="newListing__label" htmlFor="price">
+                        Preço
+                      </label>
+                      <input
+                        id="price"
+                        className="newListing__input"
+                        type="number"
+                        name="price"
+                        min="0"
+                        step="0.01"
+                        placeholder="Ex.: 199.90"
+                        value={listingData.price}
+                        onChange={handleListingChange}
+                      />
+                    </div>
+
+                    <div className="newListing__field-group">
+                      <label className="newListing__label" htmlFor="quantity">
+                        Quantidade
+                      </label>
+                      <input
+                        id="quantity"
+                        className="newListing__input"
+                        type="number"
+                        name="quantity"
+                        min="1"
+                        value={listingData.quantity}
+                        onChange={handleListingChange}
+                      />
+                    </div>
+
+                    <div className="newListing__field-group">
+                      <label className="newListing__label" htmlFor="certified">
+                        Certificada
+                      </label>
+                      <select
+                        id="certified"
+                        className="newListing__select"
+                        name="certified"
+                        value={listingData.certified}
+                        onChange={handleListingChange}
+                      >
+                        <option value="">Selecione</option>
+                        <option value="true">Sim</option>
+                        <option value="false">Não</option>
+                      </select>
+                    </div>
+
+                    <div className="newListing__field-group">
+                      <label className="newListing__label" htmlFor="gradingCompany">
+                        Empresa de certificação
+                      </label>
+                      <input
+                        id="gradingCompany"
+                        className="newListing__input"
+                        type="text"
+                        name="gradingCompany"
+                        placeholder="Ex.: PSA"
+                        value={listingData.gradingCompany}
+                        onChange={handleListingChange}
+                      />
+                    </div>
+
+                    <div className="newListing__field-group">
+                      <label className="newListing__label" htmlFor="grade">
+                        Nota
+                      </label>
+                      <input
+                        id="grade"
+                        className="newListing__input"
+                        type="text"
+                        name="grade"
+                        placeholder="Ex.: 10"
+                        value={listingData.grade}
+                        onChange={handleListingChange}
+                      />
+                    </div>
+
+                    <div className="newListing__field-group">
+                      <label className="newListing__label" htmlFor="city">
+                        Cidade
+                      </label>
+                      <input
+                        id="city"
+                        className="newListing__input"
+                        type="text"
+                        name="city"
+                        placeholder="Cidade"
+                        value={listingData.city}
+                        onChange={handleListingChange}
+                      />
+                    </div>
+
+                    <div className="newListing__field-group">
+                      <label className="newListing__label" htmlFor="state">
+                        Estado
+                      </label>
+                      <input
+                        id="state"
+                        className="newListing__input"
+                        type="text"
+                        name="state"
+                        placeholder="Estado"
+                        value={listingData.state}
+                        onChange={handleListingChange}
+                      />
+                    </div>
+
+                    <div className="newListing__field-group newListing__field-group--full">
+                      <label className="newListing__label" htmlFor="description">
+                        Descrição
+                      </label>
+                      <textarea
+                        id="description"
+                        className="newListing__textarea"
+                        name="description"
+                        placeholder="Descreva o anúncio"
+                        value={listingData.description}
+                        onChange={handleListingChange}
+                      />
+                    </div>
+
+                    <div className="newListing__field-group newListing__field-group--full">
+                      <label className="newListing__label" htmlFor="defects">
+                        Defeitos ou observações
+                      </label>
+                      <textarea
+                        id="defects"
+                        className="newListing__textarea"
+                        name="defects"
+                        placeholder="Informe riscos, whitening, marcas, etc."
+                        value={listingData.defects}
+                        onChange={handleListingChange}
+                      />
+                    </div>
+
+                    <div className="newListing__field-group newListing__field-group--full">
+                      <label className="newListing__label">
+                        Fotos obrigatórias do item
+                      </label>
+
+                      <p className="newListing__helper">
+                        Envie uma foto por etapa. Isso reduz a altura da tela e guia
+                        o seller no fluxo correto.
+                      </p>
+
+                      <div className="newListing__stepper">
+                        <div className="newListing__stepper-progress">
+                          <div className="newListing__stepper-track" />
+
+                          {PHOTO_STEPS.map((step, index) => {
+                            const isCompleted = Boolean(
+                              requiredPhotos[step.key]
+                            )
+                            const isActive = activePhotoStep === index
+
+                            return (
+                              <button
+                                key={step.key}
+                                type="button"
+                                className={`newListing__stepper-dot ${
+                                  isActive ? 'newListing__stepper-dot--active' : ''
+                                } ${
+                                  isCompleted
+                                    ? 'newListing__stepper-dot--completed'
+                                    : ''
+                                }`}
+                                onClick={() => handleGoToPhotoStep(index)}
+                              >
+                                <span className="newListing__stepper-dot-number">
+                                  {index + 1}
+                                </span>
+                                <span className="newListing__stepper-dot-label">
+                                  {step.title}
+                                </span>
+                              </button>
+                            )
+                          })}
+                        </div>
+
+                        <div className="newListing__stepper-summary">
+                          <span className="newListing__stepper-summary-text">
+                            {completedPhotoSteps} de {PHOTO_STEPS.length} fotos enviadas
                           </span>
                         </div>
 
-                        <p className="newListing__photo-instruction">
-                          {currentPhotoStep.instruction}
-                        </p>
-
-                        <input
-                          id={currentPhotoStep.key}
-                          className="newListing__input"
-                          type="file"
-                          name={currentPhotoStep.key}
-                          accept="image/*"
-                          onChange={handleRequiredPhotoChange}
-                        />
-
-                        {currentPhotoFile && (
-                          <>
-                            <div className="newListing__photo-preview-box">
-                              <img
-                                className="newListing__photo-preview"
-                                src={currentPhotoPreview}
-                                alt={currentPhotoStep.alt}
-                              />
+                        <div className="newListing__stepper-card">
+                          <div className="newListing__photo-step-header">
+                            <div className="newListing__stepper-card-title-wrap">
+                              <p className="newListing__stepper-card-step">
+                                Etapa {activePhotoStep + 1}
+                              </p>
+                              <h3 className="newListing__stepper-card-title">
+                                {currentPhotoStep.title}
+                              </h3>
                             </div>
 
+                            <span
+                              className={`newListing__photo-status ${
+                                currentPhotoFile
+                                  ? 'newListing__photo-status--sent'
+                                  : 'newListing__photo-status--pending'
+                              }`}
+                            >
+                              {getPhotoStatus(currentPhotoFile)}
+                            </span>
+                          </div>
+
+                          <p className="newListing__photo-instruction">
+                            {currentPhotoStep.instruction}
+                          </p>
+
+                          <input
+                            id={currentPhotoStep.key}
+                            className="newListing__input"
+                            type="file"
+                            name={currentPhotoStep.key}
+                            accept="image/*"
+                            onChange={handleRequiredPhotoChange}
+                          />
+
+                          {currentPhotoFile && (
+                            <>
+                              <div className="newListing__photo-preview-box">
+                                <img
+                                  className="newListing__photo-preview"
+                                  src={currentPhotoPreview}
+                                  alt={currentPhotoStep.alt}
+                                />
+                              </div>
+
+                              <button
+                                type="button"
+                                className="newListing__btn newListing__btn--ghost"
+                                onClick={() =>
+                                  handleRemoveRequiredPhoto(currentPhotoStep.key)
+                                }
+                              >
+                                Remover foto
+                              </button>
+                            </>
+                          )}
+
+                          <div className="newListing__stepper-actions">
                             <button
                               type="button"
                               className="newListing__btn newListing__btn--ghost"
-                              onClick={() =>
-                                handleRemoveRequiredPhoto(currentPhotoStep.key)
-                              }
+                              onClick={handlePrevPhotoStep}
+                              disabled={activePhotoStep === 0}
                             >
-                              Remover foto
+                              Anterior
                             </button>
-                          </>
-                        )}
 
-               <div className="newListing__stepper-actions">
-                  <button
-                    type="button"
-                    className="newListing__btn newListing__btn--ghost"
-                    onClick={handlePrevPhotoStep}
-                    disabled={activePhotoStep === 0}
-                  >
-                    Anterior
-                  </button>
-                                    
-                  {allPhotosSent && activePhotoStep === PHOTO_STEPS.length - 1 ? (
-                    <button
-                      type="button"
-                      className="newListing__btn newListing__stepper-complete-btn"
-                    >
-                      Concluir fotos
-                    </button>
-                  ) : (
-                    <button
-                      type="button"
-                      className="newListing__btn"
-                      onClick={handleNextPhotoStep}
-                      disabled={activePhotoStep === PHOTO_STEPS.length - 1}
-                    >
-                      Próxima
-                    </button>
-                  )}
-                </div>
-            </div>
+                            {allPhotosSent && activePhotoStep === PHOTO_STEPS.length - 1 ? (
+                              <button
+                                type="button"
+                                className="newListing__btn newListing__stepper-complete-btn"
+                              >
+                                Concluir fotos
+                              </button>
+                            ) : (
+                              <button
+                                type="button"
+                                className="newListing__btn"
+                                onClick={handleNextPhotoStep}
+                                disabled={activePhotoStep === PHOTO_STEPS.length - 1}
+                              >
+                                Próxima
+                              </button>
+                            )}
+                          </div>
+                        </div>
+                      </div>
 
                       {allPhotosSent && (
                         <p className="newListing__stepper-complete">
@@ -823,40 +835,40 @@ const handleCreate = async (e) => {
                       )}
                     </div>
                   </div>
-                </div>
 
-                <div className="newListing__checkboxes">
-                  <label className="newListing__checkbox">
-                    <input
-                      type="checkbox"
-                      name="shippingAvailable"
-                      checked={listingData.shippingAvailable}
-                      onChange={handleListingChange}
-                    />
-                    Envio disponível
-                  </label>
+                  <div className="newListing__checkboxes">
+                    <label className="newListing__checkbox">
+                      <input
+                        type="checkbox"
+                        name="shippingAvailable"
+                        checked={listingData.shippingAvailable}
+                        onChange={handleListingChange}
+                      />
+                      Envio disponível
+                    </label>
 
-                  <label className="newListing__checkbox">
-                    <input
-                      type="checkbox"
-                      name="localPickup"
-                      checked={listingData.localPickup}
-                      onChange={handleListingChange}
-                    />
-                    Retirada em mãos
-                  </label>
+                    <label className="newListing__checkbox">
+                      <input
+                        type="checkbox"
+                        name="localPickup"
+                        checked={listingData.localPickup}
+                        onChange={handleListingChange}
+                      />
+                      Retirada em mãos
+                    </label>
 
-                  <label className="newListing__checkbox">
-                    <input
-                      type="checkbox"
-                      name="acceptsOffer"
-                      checked={listingData.acceptsOffer}
-                      onChange={handleListingChange}
-                    />
-                    Aceita oferta
-                  </label>
-                </div>
-              </section>
+                    <label className="newListing__checkbox">
+                      <input
+                        type="checkbox"
+                        name="acceptsOffer"
+                        checked={listingData.acceptsOffer}
+                        onChange={handleListingChange}
+                      />
+                      Aceita oferta
+                    </label>
+                  </div>
+                </section>
+              )}
 
               <div className="newListing__actions">
                 <button className="newListing__btn" type="submit">

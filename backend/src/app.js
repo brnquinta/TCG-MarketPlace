@@ -29,6 +29,7 @@ import listingRoutes from './routes/listingRoutes.js'
 import webhookRoutes from './routes/webhookRoutes.js'
 import cartRoutes from './routes/cartRoutes.js'
 import debugRoutes from './routes/debugRoutes.js'
+import uploadRoutes from './routes/uploadRoutes.js'
 import { authenticateToken, optionalAuth } from './middleware/auth.js'
 
 // ========================
@@ -40,7 +41,9 @@ const PORT = process.env.PORT || 3001
 // ========================
 // MIDDLEWARES
 // ========================
-app.use(helmet())
+app.use(helmet({
+  crossOriginResourcePolicy: { policy: 'cross-origin' },
+}))
 app.use(cors({
   origin: ['http://localhost:5173', 'http://127.0.0.1:5173'],
   credentials: true
@@ -64,9 +67,13 @@ app.get('/api/health', (req, res) => {
   })
 })
 
+const uploadsPath = path.join(__dirname, '../uploads')
+app.use('/uploads', express.static(uploadsPath))
+
 app.use('/api/auth', authRoutes)
 app.use('/api/stores', optionalAuth, storeRoutes)
 app.use('/api/listings', optionalAuth, listingRoutes)
+app.use('/api/uploads', uploadRoutes)
 app.use('/api/webhooks', webhookRoutes)
 app.use('/api/cart', authenticateToken, cartRoutes)
 app.use('/api/debug', debugRoutes)

@@ -91,3 +91,38 @@ export const listingAPI = {
       method: 'DELETE',
     }),
 }
+
+/* ================= UPLOADS ================= */
+export const uploadAPI = {
+  uploadListingPhotos: async (formData) => {
+    const token = await window.Clerk?.session?.getToken()
+
+    console.log('[API] UPLOAD →', { url: `${API_URL}/uploads/listing-photos` })
+
+    const res = await fetch(`${API_URL}/uploads/listing-photos`, {
+      method: 'POST',
+      headers: {
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      },
+      body: formData,
+    })
+
+    console.log('[API] UPLOAD STATUS →', res.status)
+
+    const rawText = await res.clone().text()
+    console.log('[API] UPLOAD RESPONSE →', rawText)
+
+    if (!res.ok) {
+      let error = {}
+      try {
+        error = JSON.parse(rawText)
+      } catch (e) {
+        console.log('[API] upload response is not JSON')
+      }
+      console.error('[API] UPLOAD ERROR →', error)
+      throw new Error(error.message || 'Erro no upload das fotos')
+    }
+
+    return JSON.parse(rawText)
+  },
+}
