@@ -5,7 +5,7 @@ const router = express.Router()
 
 router.post('/', createStore)
 router.get('/me', getMyStore)
-router.put('/me', updateStore)
+router.patch('/me', updateStore)
 router.get('/slug/:slug', getStoreBySlug)
 router.get('/', getAllStores)
 

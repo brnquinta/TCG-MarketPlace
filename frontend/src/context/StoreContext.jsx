@@ -1,5 +1,6 @@
 import { createContext, useState, useEffect } from 'react'
 import { useUser } from '@clerk/clerk-react'
+import { storeAPI } from '../services/api'
 
 export const StoreContext = createContext(null)
 
@@ -64,22 +65,37 @@ export function StoreProvider({ children }) {
   }, [user, isLoaded])
 
   // ================= STORE =================
-  const updateStore = (updates) => {
-    setStore((prev) => (prev ? { ...prev, ...updates } : null))
-  }
+  const updateStore = async (updates) => {
+    const previousStore = store
 
-  const updateLocation = (updates) => {
-    setStore((prev) =>
-      prev
-        ? {
-            ...prev,
-            location: {
-              ...prev.location,
-              ...updates,
-            },
-          }
-        : null
-    )
+    setStore((prev) => {
+      if (!prev) return null
+      if (updates.location) {
+        return { ...prev, ...updates, location: { ...prev.location, ...updates.location } }
+      }
+      return { ...prev, ...updates }
+    })
+
+    try {
+      const payload = { ...updates }
+      if (updates.city || updates.state) {
+        payload.location = {
+          ...(store?.location || {}),
+          ...(updates.city !== undefined && { city: updates.city }),
+          ...(updates.state !== undefined && { state: updates.state }),
+        }
+        delete payload.city
+        delete payload.state
+      }
+
+      const updated = await storeAPI.update(payload)
+      setStore(updated)
+      return updated
+    } catch (err) {
+      console.error('Erro updateStore:', err)
+      setStore(previousStore)
+      throw err
+    }
   }
 
   // ================= LISTINGS (NOVO) =================
@@ -112,7 +128,6 @@ export function StoreProvider({ children }) {
 
         fetchStore,
         updateStore,
-        updateLocation,
 
         listingFilters,
         setListingFilters,

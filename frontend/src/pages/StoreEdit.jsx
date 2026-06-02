@@ -7,12 +7,13 @@ const BANNER_MIN_HEIGHT = 200
 const LOGO_MIN_SIZE = 100
 
 function StoreEdit() {
-  const { store, updateStore, updateLocation } = useStore()
+  const { store, updateStore } = useStore()
 
   const [isEditing, setIsEditing] = useState(false)
   const [bannerError, setBannerError] = useState('')
   const [logoError, setLogoError] = useState('')
   const [storeStatus, setStoreStatus] = useState(store.status || 'active')
+  const [saving, setSaving] = useState(false)
   const bannerInputRef = useRef(null)
   const logoInputRef = useRef(null)
   const [formData, setFormData] = useState({
@@ -30,20 +31,26 @@ function StoreEdit() {
     setFormData((prev) => ({ ...prev, [name]: value }))
   }
 
-  const handleSave = () => {
-    updateStore({
-      name: formData.name,
-      slug: formData.slug,
-      logoUrl: formData.logoUrl,
-      bannerUrl: formData.bannerUrl,
-      description: formData.description,
-      status: storeStatus,
-    })
-    updateLocation({
-      city: formData.city,
-      state: formData.state,
-    })
-    setIsEditing(false)
+  const handleSave = async () => {
+    setSaving(true)
+    try {
+      await updateStore({
+        name: formData.name,
+        slug: formData.slug,
+        logoUrl: formData.logoUrl,
+        bannerUrl: formData.bannerUrl,
+        description: formData.description,
+        status: storeStatus,
+        city: formData.city,
+        state: formData.state,
+      })
+      setIsEditing(false)
+    } catch (err) {
+      console.error('Erro ao salvar loja:', err)
+      alert('Erro ao salvar. Tente novamente.')
+    } finally {
+      setSaving(false)
+    }
   }
 
   const handleCancel = () => {
@@ -318,13 +325,15 @@ function StoreEdit() {
                     className="storeEdit__btn storeEdit__btn--primary"
                     type="button"
                     onClick={handleSave}
+                    disabled={saving}
                   >
-                    Salvar
+                    {saving ? 'Salvando...' : 'Salvar'}
                   </button>
                   <button
                     className="storeEdit__btn storeEdit__btn--secondary"
                     type="button"
                     onClick={handleCancel}
+                    disabled={saving}
                   >
                     Cancelar
                   </button>

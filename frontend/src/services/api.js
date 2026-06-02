@@ -67,8 +67,8 @@ export const storeAPI = {
     }),
 
   update: (data) =>
-    request('/stores', {
-      method: 'PUT',
+    request('/stores/me', {
+      method: 'PATCH',
       body: JSON.stringify(data),
     }),
 }
