@@ -1,6 +1,7 @@
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { useStore } from '../hooks/useStore'
+import { useApiStore } from '../hooks/useApiStore'
 import { uploadAPI } from '../services/api'
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api'
@@ -11,6 +12,7 @@ const LOGO_MIN_SIZE = 100
 
 function StoreEdit() {
   const { store, updateStore } = useStore()
+  const { fetchListingsFromBackend, deleteListingOnBackend } = useApiStore()
 
   const [isEditing, setIsEditing] = useState(false)
   const [bannerError, setBannerError] = useState('')
@@ -19,6 +21,8 @@ function StoreEdit() {
   const [saving, setSaving] = useState(false)
   const [uploadingBanner, setUploadingBanner] = useState(false)
   const [uploadingLogo, setUploadingLogo] = useState(false)
+  const [listings, setListings] = useState([])
+  const [listingsLoading, setListingsLoading] = useState(true)
   const bannerInputRef = useRef(null)
   const logoInputRef = useRef(null)
   const [formData, setFormData] = useState({
@@ -30,6 +34,48 @@ function StoreEdit() {
     city: store.location.city,
     state: store.location.state,
   })
+
+  useEffect(() => {
+    async function loadListings() {
+      try {
+        const data = await fetchListingsFromBackend()
+        setListings(data)
+      } catch (err) {
+        console.error('Erro ao buscar anuncios:', err)
+      } finally {
+        setListingsLoading(false)
+      }
+    }
+
+    if (store) {
+      loadListings()
+    }
+  }, [store, fetchListingsFromBackend])
+
+  const handleDeleteListing = async (listingId) => {
+    if (!confirm('Tem certeza que deseja excluir este anuncio?')) return
+    try {
+      await deleteListingOnBackend(listingId)
+      setListings((prev) => prev.filter((l) => l._id !== listingId))
+    } catch (err) {
+      console.error('Erro ao excluir:', err)
+    }
+  }
+
+  const getStatusLabel = (status) => {
+    const map = { active: 'Ativo', draft: 'Rascunho', sold: 'Vendido', inactive: 'Inativo', removed: 'Removido' }
+    return map[status] || status
+  }
+
+  const getStatusClass = (status) => {
+    const map = {
+      active: 'store-dashboard__listing-status--active',
+      draft: 'store-dashboard__listing-status--draft',
+      sold: 'store-dashboard__listing-status--sold',
+      inactive: 'store-dashboard__listing-status--inactive',
+    }
+    return map[status] || ''
+  }
 
   const handleChange = (e) => {
     const { name, value } = e.target
@@ -151,7 +197,7 @@ function StoreEdit() {
     }
   }
 
-  const listings = store.stats?.activeListings || 0
+  const listingsCount = store.stats?.activeListings || 0
 
   return (
     <section className="storeEdit">
@@ -230,7 +276,7 @@ function StoreEdit() {
 
         <div className="storeEdit__stats">
           <div className="storeEdit__stat">
-            <span className="storeEdit__stat-value">{listings}</span>
+            <span className="storeEdit__stat-value">{listingsCount}</span>
             <span className="storeEdit__stat-label">Anúncios</span>
           </div>
 
@@ -385,17 +431,75 @@ function StoreEdit() {
         <div className="storeEdit__main">
           <div className="storeEdit__main-header">
             <h2 className="storeEdit__section-title">Anúncios da loja</h2>
-          </div>
-
-          <div className="storeEdit__empty">
-            <h3 className="storeEdit__empty-title">Nenhum anúncio disponível</h3>
-            <p className="storeEdit__empty-text">
-              Esta loja ainda não possui cartas anunciadas.
-            </p>
-            <Link to="/new-listing" className="storeEdit__create-btn">
-              Criar primeiro anúncio
+            <Link to="/new-listing" className="store-edit__new-listing-btn">
+              Novo anúncio
             </Link>
           </div>
+
+          {listingsLoading ? (
+            <p className="storeEdit__empty-text">Carregando anúncios...</p>
+          ) : listings.length > 0 ? (
+            <div className="store-dashboard__listings">
+              {listings.map((listing) => (
+                <article key={listing._id} className="store-dashboard__listing-card">
+                  <Link
+                    to={`/listing/${listing._id}`}
+                    className="store-dashboard__listing-image"
+                  >
+                    <img
+                      src={listing.cardSnapshot?.imageSmall}
+                      alt={listing.cardSnapshot?.name}
+                    />
+                  </Link>
+
+                  <div className="store-dashboard__listing-info">
+                    <Link
+                      to={`/listing/${listing._id}`}
+                      className="store-dashboard__listing-name"
+                    >
+                      {listing.cardSnapshot?.name}
+                    </Link>
+                    <p className="store-dashboard__listing-meta">
+                      {listing.cardSnapshot?.setName} &bull; #{listing.cardSnapshot?.number} &bull; {listing.listingData?.condition}
+                    </p>
+                  </div>
+
+                  <div className="store-dashboard__listing-right">
+                    <p className="store-dashboard__listing-price">
+                      R$ {listing.listingData?.price?.toFixed(2)}
+                    </p>
+                    <span className={`store-dashboard__listing-status ${getStatusClass(listing.status)}`}>
+                      {getStatusLabel(listing.status)}
+                    </span>
+                    <div className="store-dashboard__listing-actions">
+                      <Link
+                        to={`/listing/${listing._id}`}
+                        className="store-dashboard__listing-action store-dashboard__listing-action--view"
+                      >
+                        Ver
+                      </Link>
+                      <button
+                        className="store-dashboard__listing-action store-dashboard__listing-action--delete"
+                        onClick={() => handleDeleteListing(listing._id)}
+                      >
+                        Excluir
+                      </button>
+                    </div>
+                  </div>
+                </article>
+              ))}
+            </div>
+          ) : (
+            <div className="storeEdit__empty">
+              <h3 className="storeEdit__empty-title">Nenhum anúncio disponível</h3>
+              <p className="storeEdit__empty-text">
+                Esta loja ainda não possui cartas anunciadas.
+              </p>
+              <Link to="/new-listing" className="storeEdit__create-btn">
+                Criar primeiro anúncio
+              </Link>
+            </div>
+          )}
         </div>
       </div>
     </section>
