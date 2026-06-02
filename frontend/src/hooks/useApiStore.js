@@ -91,7 +91,7 @@ export function useApiStore() {
 
     try {
       const response = await listingAPI.getMyListings()
-      return response.data
+      return Array.isArray(response) ? response : (response.data || [])
     } catch (err) {
       console.error('Error fetching listings:', err)
       return []

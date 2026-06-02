@@ -73,7 +73,7 @@ export const storeAPI = {
 
 /* ================= LISTINGS ================= */
 export const listingAPI = {
-  getMyListings: () => request('/listings/me'),
+  getMyListings: () => request('/listings/my'),
 
   getPublic: (params = {}) => {
     const query = new URLSearchParams(params).toString()

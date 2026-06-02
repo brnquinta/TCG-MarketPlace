@@ -54,11 +54,13 @@ export const optionalAuth = async (req, res, next) => {
         clerkId: payload.sub,
         email: payload.email
       }
+    } else {
+      req.user = null
     }
 
     next()
   } catch (error) {
-    console.error('optionalAuth: token verification failed:', error.message)
+    req.user = null
     next()
   }
 }

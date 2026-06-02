@@ -78,6 +78,9 @@ const normalizeListingData = (data) => {
 
 export const createListing = async (req, res) => {
   try {
+    if (!req.user?.clerkId) {
+      return res.status(401).json({ error: 'Authentication required' })
+    }
     const clerkId = req.user.clerkId
     const user = await User.findOne({ clerkId })
 
@@ -123,6 +126,9 @@ export const createListing = async (req, res) => {
 
 export const getMyListings = async (req, res) => {
   try {
+    if (!req.user?.clerkId) {
+      return res.status(401).json({ error: 'Authentication required' })
+    }
     const clerkId = req.user.clerkId
     const user = await User.findOne({ clerkId })
 
@@ -141,6 +147,9 @@ export const getMyListings = async (req, res) => {
 
 export const updateListing = async (req, res) => {
   try {
+    if (!req.user?.clerkId) {
+      return res.status(401).json({ error: 'Authentication required' })
+    }
     const { id } = req.params
     const clerkId = req.user.clerkId
     const user = await User.findOne({ clerkId })
@@ -181,6 +190,9 @@ export const updateListing = async (req, res) => {
 
 export const deleteListing = async (req, res) => {
   try {
+    if (!req.user?.clerkId) {
+      return res.status(401).json({ error: 'Authentication required' })
+    }
     const { id } = req.params
     const clerkId = req.user.clerkId
     const user = await User.findOne({ clerkId })
