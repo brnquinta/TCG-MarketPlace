@@ -1,57 +1,78 @@
+import { useState, useEffect } from 'react'
 import { Link, useParams } from 'react-router-dom'
+import { storeAPI } from '../services/api'
+
+const CONDITION_LABELS = {
+  NM: 'Near Mint',
+  LP: 'Lightly Played',
+  MP: 'Moderately Played',
+  HP: 'Heavily Played',
+  DM: 'Damaged',
+}
+
+const LANGUAGE_LABELS = {
+  'PT-BR': 'Português',
+  EN: 'Inglês',
+  JP: 'Japonês',
+  ES: 'Espanhol',
+  FR: 'Francês',
+  DE: 'Alemão',
+  IT: 'Italiano',
+  KO: 'Coreano',
+  ZH: 'Chinês',
+}
 
 function Store() {
-  const { userId } = useParams()
+  const { slug } = useParams()
+  const [store, setStore] = useState(null)
+  const [listings, setListings] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
 
-  const store = {
-    id: userId,
-    name: 'Loja do Bruno TCG',
-    slug: 'loja-do-bruno-tcg',
-    logoUrl: '',
-    bannerUrl: '',
-    description:
-      'Loja focada em cartas Pokémon para coleção e competitivo, com atenção especial para cartas raras e itens bem conservados.',
-    location: {
-      city: 'Rio de Janeiro',
-      state: 'RJ',
-    },
-    stats: {
-      listingsCount: 6,
-      salesCount: 18,
-      rating: 4.8,
-      reviewsCount: 24,
-    },
+  useEffect(() => {
+    async function fetchStore() {
+      try {
+        setLoading(true)
+        const data = await storeAPI.getPublicBySlug(slug)
+        setStore(data.store)
+        setListings(data.listings)
+      } catch (err) {
+        console.error('Erro ao carregar loja:', err)
+        setError('Loja não encontrada')
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchStore()
+  }, [slug])
+
+  function formatPrice(price) {
+    return price.toLocaleString('pt-BR', {
+      style: 'currency',
+      currency: 'BRL',
+    })
   }
 
-  const listings = [
-    {
-      id: '1',
-      name: 'Charizard ex',
-      imageUrl: 'https://images.pokemontcg.io/sv3pt5/183_hires.png',
-      price: 'R$ 299,90',
-      condition: 'Near Mint',
-      language: 'Português',
-      certified: true,
-    },
-    {
-      id: '2',
-      name: 'Blastoise ex',
-      imageUrl: 'https://images.pokemontcg.io/sv3pt5/184_hires.png',
-      price: 'R$ 219,90',
-      condition: 'Excellent',
-      language: 'Inglês',
-      certified: false,
-    },
-    {
-      id: '3',
-      name: 'Venusaur ex',
-      imageUrl: 'https://images.pokemontcg.io/sv3pt5/182_hires.png',
-      price: 'R$ 189,90',
-      condition: 'Near Mint',
-      language: 'Português',
-      certified: false,
-    },
-  ]
+  if (loading) {
+    return (
+      <section className="store">
+        <div style={{ padding: '4rem 2rem', textAlign: 'center', color: '#6b7280' }}>
+          Carregando loja...
+        </div>
+      </section>
+    )
+  }
+
+  if (error || !store) {
+    return (
+      <section className="store">
+        <div style={{ padding: '4rem 2rem', textAlign: 'center', color: '#6b7280' }}>
+          {error || 'Loja não encontrada'}
+        </div>
+      </section>
+    )
+  }
 
   return (
     <section className="store">
@@ -94,22 +115,22 @@ function Store() {
 
         <div className="store__stats">
           <div className="store__stat">
-            <span className="store__stat-value">{store.stats.listingsCount}</span>
+            <span className="store__stat-value">{listings.length}</span>
             <span className="store__stat-label">Anúncios</span>
           </div>
 
           <div className="store__stat">
-            <span className="store__stat-value">{store.stats.salesCount}</span>
+            <span className="store__stat-value">{store.stats.totalSales}</span>
             <span className="store__stat-label">Vendas</span>
           </div>
 
           <div className="store__stat">
             <span className="store__stat-value store__stat-value--rating">
               <span className="store__rating-star">★</span>
-              {store.stats.rating}
+              {store.rating.average || '0.0'}
             </span>
             <span className="store__stat-label">
-              {store.stats.reviewsCount} avaliações
+              {store.rating.reviewsCount} avaliações
             </span>
           </div>
         </div>
@@ -119,7 +140,7 @@ function Store() {
         <aside className="store__sidebar">
           <div className="store__card">
             <h2 className="store__section-title">Sobre a loja</h2>
-            <p className="store__description">{store.description}</p>
+            <p className="store__description">{store.description || 'Loja ainda não possui descrição.'}</p>
           </div>
 
           <div className="store__card">
@@ -127,13 +148,35 @@ function Store() {
             <ul className="store__details">
               <li className="store__detail-item">
                 <span className="store__detail-label">Cidade</span>
-                <span className="store__detail-value">{store.location.city}</span>
+                <span className="store__detail-value">{store.location.city || '—'}</span>
               </li>
               <li className="store__detail-item">
                 <span className="store__detail-label">Estado</span>
-                <span className="store__detail-value">{store.location.state}</span>
+                <span className="store__detail-value">{store.location.state || '—'}</span>
               </li>
             </ul>
+          </div>
+
+          <div className="store__card">
+            <h2 className="store__section-title">Ações</h2>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+              <button
+                type="button"
+                className="store__listing-button"
+                style={{ width: '100%', opacity: 0.6, cursor: 'not-allowed' }}
+                disabled
+              >
+                Avaliar loja
+              </button>
+              <button
+                type="button"
+                className="store__listing-button"
+                style={{ width: '100%', opacity: 0.6, cursor: 'not-allowed' }}
+                disabled
+              >
+                Comentar
+              </button>
+            </div>
           </div>
         </aside>
 
@@ -145,28 +188,30 @@ function Store() {
           {listings.length > 0 ? (
             <div className="store__grid">
               {listings.map((listing) => (
-                <article key={listing.id} className="store__listing-card">
+                <article key={listing._id} className="store__listing-card">
                   <div className="store__listing-image-wrapper">
                     <img
                       className="store__listing-image"
-                      src={listing.imageUrl}
-                      alt={listing.name}
+                      src={listing.cardSnapshot.imageSmall || listing.photos.front90}
+                      alt={listing.cardSnapshot.name}
                     />
                   </div>
 
                   <div className="store__listing-content">
-                    <h3 className="store__listing-title">{listing.name}</h3>
+                    <h3 className="store__listing-title">{listing.cardSnapshot.name}</h3>
 
-                    <p className="store__listing-price">{listing.price}</p>
+                    <p className="store__listing-price">
+                      {formatPrice(listing.listingData.price)}
+                    </p>
 
                     <ul className="store__listing-meta">
-                      <li>{listing.condition}</li>
-                      <li>{listing.language}</li>
-                      <li>{listing.certified ? 'Certificada' : 'Não certificada'}</li>
+                      <li>{CONDITION_LABELS[listing.listingData.condition] || listing.listingData.condition}</li>
+                      <li>{LANGUAGE_LABELS[listing.listingData.language] || listing.listingData.language}</li>
+                      <li>{listing.listingData.certified ? 'Certificada' : 'Não certificada'}</li>
                     </ul>
 
                     <Link
-                      to={`/card/${listing.id}`}
+                      to={`/listing/${listing._id}`}
                       className="store__listing-button"
                     >
                       Ver carta

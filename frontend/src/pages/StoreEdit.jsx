@@ -12,6 +12,7 @@ function StoreEdit() {
   const [isEditing, setIsEditing] = useState(false)
   const [bannerError, setBannerError] = useState('')
   const [logoError, setLogoError] = useState('')
+  const [storeStatus, setStoreStatus] = useState(store.status || 'active')
   const bannerInputRef = useRef(null)
   const logoInputRef = useRef(null)
   const [formData, setFormData] = useState({
@@ -36,6 +37,7 @@ function StoreEdit() {
       logoUrl: formData.logoUrl,
       bannerUrl: formData.bannerUrl,
       description: formData.description,
+      status: storeStatus,
     })
     updateLocation({
       city: formData.city,
@@ -54,6 +56,7 @@ function StoreEdit() {
       city: store.location.city,
       state: store.location.state,
     })
+    setStoreStatus(store.status || 'active')
     setIsEditing(false)
   }
 
@@ -298,6 +301,18 @@ function StoreEdit() {
                   />
                 </div>
 
+                <div className="storeEdit__field">
+                  <label className="storeEdit__label">Status da loja</label>
+                  <select
+                    className="storeEdit__input"
+                    value={storeStatus}
+                    onChange={(e) => setStoreStatus(e.target.value)}
+                  >
+                    <option value="active">Ativa</option>
+                    <option value="inactive">Inativa</option>
+                  </select>
+                </div>
+
                 <div className="storeEdit__form-actions">
                   <button
                     className="storeEdit__btn storeEdit__btn--primary"
@@ -342,6 +357,12 @@ function StoreEdit() {
                   <li className="storeEdit__detail-item">
                     <span className="storeEdit__detail-label">Estado</span>
                     <span className="storeEdit__detail-value">{formData.state}</span>
+                  </li>
+                  <li className="storeEdit__detail-item">
+                    <span className="storeEdit__detail-label">Status</span>
+                    <span className="storeEdit__detail-value">
+                      {storeStatus === 'active' ? 'Ativa' : 'Inativa'}
+                    </span>
                   </li>
                 </ul>
               </div>

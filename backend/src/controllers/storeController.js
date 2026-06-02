@@ -1,5 +1,6 @@
 import Store from '../models/Store.js'
 import User from '../models/User.js'
+import Listing from '../models/Listing.js'
 
 export const createStore = async (req, res) => {
   try {
@@ -33,7 +34,7 @@ export const createStore = async (req, res) => {
       bannerUrl: bannerUrl || '',
       description: description || '',
       location: location || { city: '', state: '' },
-      status: 'draft',
+      status: 'active',
       onboardingStatus: 'pending',
       rating: { average: 0, reviewsCount: 0 },
       stats: { activeListings: 0, totalSales: 0, totalViews: 0 }
@@ -84,7 +85,15 @@ export const updateStore = async (req, res) => {
       return res.status(404).json({ error: 'Store not found' })
     }
 
-    const { name, logoUrl, bannerUrl, description, location, status, onboardingStatus, contact, paymentInfo } = req.body
+    const { slug, name, logoUrl, bannerUrl, description, location, status, onboardingStatus, contact, paymentInfo } = req.body
+
+    if (slug && slug !== store.slug) {
+      const existingSlug = await Store.findOne({ slug })
+      if (existingSlug) {
+        return res.status(400).json({ error: 'Slug já em uso' })
+      }
+      store.slug = slug
+    }
 
     if (name) store.name = name
     if (logoUrl !== undefined) store.logoUrl = logoUrl
@@ -118,7 +127,10 @@ export const getStoreBySlug = async (req, res) => {
     store.stats.totalViews += 1
     await store.save()
 
-    res.json(store)
+    const listings = await Listing.find({ storeId: store._id, status: 'active' })
+      .sort({ createdAt: -1 })
+
+    res.json({ store, listings })
   } catch (error) {
     console.error('Error getting store:', error)
     res.status(500).json({ error: 'Failed to get store' })

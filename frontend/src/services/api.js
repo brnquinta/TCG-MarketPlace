@@ -58,6 +58,8 @@ export const authAPI = {
 export const storeAPI = {
   getMyStore: () => request('/stores/me'),
 
+  getPublicBySlug: (slug) => request(`/stores/slug/${slug}`),
+
   create: (data) =>
     request('/stores', {
       method: 'POST',

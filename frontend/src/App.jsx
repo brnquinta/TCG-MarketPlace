@@ -42,7 +42,7 @@ function App() {
         <Route path="/card/:id" element={<CardDetail />} />
         <Route path="/store/create" element={<CreateStore />} />
         <Route path="/store/edit" element={<StoreEdit />} />
-        <Route path="/store/:userId" element={<Store />} />
+        <Route path="/store/:slug" element={<Store />} />
         <Route path="/dashboard" element={<ProtectedDashboard />} />
         <Route path="/new-listing" element={<NewListing />} />
         <Route path="/listing/:id" element={<ListingDetails />} />
