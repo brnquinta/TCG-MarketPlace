@@ -197,8 +197,12 @@ function AdsList() {
                   <div className="ads__divider" />
 
                   <div className="ads__store">
-                    <span>{item.storeId?.name || 'Loja'}</span>
-                    <span>{item.storeId?.rating ? `★ ${item.storeId.rating}` : ''}</span>
+                    <span className="ads__store-name">{item.storeId?.name || 'Loja'}</span>
+                    <span className="ads__store-rating">
+                      {item.storeId?.rating?.average > 0
+                        ? `★ ${item.storeId.rating.average.toFixed(1)} (${item.storeId.rating.reviewsCount})`
+                        : 'Sem avaliação'}
+                    </span>
                   </div>
 
                   <p className="ads__location">

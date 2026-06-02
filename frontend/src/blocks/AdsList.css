@@ -143,6 +143,12 @@
 }
 .ads__store-name {
   font-weight: 500;
+  color: #111827;
+}
+.ads__store {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 .ads__store-rating {
   font-size: 0.7rem;
