@@ -1,4 +1,4 @@
-import { useParams } from "react-router-dom"
+import { useParams, Link } from "react-router-dom"
 import { useState, useEffect } from "react"
 import { useCart } from "../context/CartContext"
 
@@ -242,7 +242,10 @@ function ListingDetails() {
         <div className="listing-details__store">
 
           <p className="listing-details__store-name">
-            Vendido por <strong>{store.name}</strong>
+            Vendido por{' '}
+            <Link to={`/store/${store.slug}`} className="listing-details__store-link">
+              {store.name}
+            </Link>
           </p>
 
           <p className="listing-details__store-rating">

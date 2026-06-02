@@ -9,7 +9,9 @@ const __dirname = path.dirname(__filename)
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     const userId = req.user?.clerkId || 'anonymous'
-    const uploadPath = path.join(__dirname, '../../uploads/listings', userId)
+    const isStoreImage = req.path.includes('/store')
+    const baseDir = isStoreImage ? '../../uploads/stores' : '../../uploads/listings'
+    const uploadPath = path.join(__dirname, baseDir, userId)
     fs.mkdirSync(uploadPath, { recursive: true })
     cb(null, uploadPath)
   },
@@ -66,5 +68,25 @@ export const uploadListingPhotos = (req, res) => {
     }
 
     return res.json(photos)
+  })
+}
+
+export const uploadStoreImage = (req, res) => {
+  const uploadField = upload.single('image')
+
+  uploadField(req, res, (err) => {
+    if (err) {
+      console.error('Upload error:', err.message)
+      return res.status(400).json({ error: err.message })
+    }
+
+    if (!req.file) {
+      return res.status(400).json({ error: 'Nenhuma imagem enviada' })
+    }
+
+    const userId = req.user?.clerkId || 'anonymous'
+    const url = `/uploads/stores/${userId}/${req.file.filename}`
+
+    return res.json({ url })
   })
 }

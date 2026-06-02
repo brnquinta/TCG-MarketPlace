@@ -258,6 +258,16 @@
   color: #111827;
 }
 
+.listing-details__store-link {
+  color: #2563eb;
+  text-decoration: none;
+  font-weight: 700;
+}
+
+.listing-details__store-link:hover {
+  text-decoration: underline;
+}
+
 /* ===== RESPONSIVE ===== */
 
 @media (max-width: 960px) {

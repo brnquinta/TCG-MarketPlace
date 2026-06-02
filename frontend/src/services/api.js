@@ -127,4 +127,31 @@ export const uploadAPI = {
 
     return JSON.parse(rawText)
   },
+
+  uploadStoreImage: async (file) => {
+    const token = await window.Clerk?.session?.getToken()
+
+    const formData = new FormData()
+    formData.append('image', file)
+
+    const res = await fetch(`${API_URL}/uploads/store-image`, {
+      method: 'POST',
+      headers: {
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      },
+      body: formData,
+    })
+
+    if (!res.ok) {
+      let error = {}
+      try {
+        error = await res.json()
+      } catch (e) {
+        // ignore
+      }
+      throw new Error(error.message || 'Erro no upload da imagem')
+    }
+
+    return res.json()
+  },
 }

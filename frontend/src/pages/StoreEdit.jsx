@@ -1,6 +1,9 @@
 import { useState, useRef } from 'react'
 import { Link } from 'react-router-dom'
 import { useStore } from '../hooks/useStore'
+import { uploadAPI } from '../services/api'
+
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api'
 
 const BANNER_MIN_WIDTH = 800
 const BANNER_MIN_HEIGHT = 200
@@ -14,6 +17,8 @@ function StoreEdit() {
   const [logoError, setLogoError] = useState('')
   const [storeStatus, setStoreStatus] = useState(store.status || 'active')
   const [saving, setSaving] = useState(false)
+  const [uploadingBanner, setUploadingBanner] = useState(false)
+  const [uploadingLogo, setUploadingLogo] = useState(false)
   const bannerInputRef = useRef(null)
   const logoInputRef = useRef(null)
   const [formData, setFormData] = useState({
@@ -107,9 +112,19 @@ function StoreEdit() {
       setBannerError(result.message)
       return
     }
+
     setBannerError('')
-    const url = URL.createObjectURL(file)
-    setFormData((prev) => ({ ...prev, bannerUrl: url }))
+    setUploadingBanner(true)
+    try {
+      const data = await uploadAPI.uploadStoreImage(file)
+      const fullUrl = `${API_URL.replace(/\/api$/, '')}${data.url}`
+      setFormData((prev) => ({ ...prev, bannerUrl: fullUrl }))
+    } catch (err) {
+      console.error('Erro ao上传 banner:', err)
+      setBannerError('Erro ao enviar imagem. Tente novamente.')
+    } finally {
+      setUploadingBanner(false)
+    }
   }
 
   const handleLogoChange = async (e) => {
@@ -121,9 +136,19 @@ function StoreEdit() {
       setLogoError(result.message)
       return
     }
+
     setLogoError('')
-    const url = URL.createObjectURL(file)
-    setFormData((prev) => ({ ...prev, logoUrl: url }))
+    setUploadingLogo(true)
+    try {
+      const data = await uploadAPI.uploadStoreImage(file)
+      const fullUrl = `${API_URL.replace(/\/api$/, '')}${data.url}`
+      setFormData((prev) => ({ ...prev, logoUrl: fullUrl }))
+    } catch (err) {
+      console.error('Erro ao enviar logo:', err)
+      setLogoError('Erro ao enviar imagem. Tente novamente.')
+    } finally {
+      setUploadingLogo(false)
+    }
   }
 
   const listings = store.stats?.activeListings || 0
@@ -144,8 +169,9 @@ function StoreEdit() {
           className="storeEdit__banner-edit"
           type="button"
           onClick={handleBannerClick}
+          disabled={uploadingBanner}
         >
-          Editar banner
+          {uploadingBanner ? 'Enviando...' : 'Editar banner'}
         </button>
         <input
           ref={bannerInputRef}
@@ -177,8 +203,9 @@ function StoreEdit() {
               className="storeEdit__logo-edit"
               type="button"
               onClick={handleLogoClick}
+              disabled={uploadingLogo}
             >
-              Editar
+              {uploadingLogo ? 'Enviando...' : 'Editar'}
             </button>
             <input
               ref={logoInputRef}
@@ -248,30 +275,6 @@ function StoreEdit() {
                     name="slug"
                     value={formData.slug}
                     onChange={handleChange}
-                  />
-                </div>
-
-                <div className="storeEdit__field">
-                  <label className="storeEdit__label">Logo URL</label>
-                  <input
-                    className="storeEdit__input"
-                    type="url"
-                    name="logoUrl"
-                    value={formData.logoUrl}
-                    onChange={handleChange}
-                    placeholder="https://..."
-                  />
-                </div>
-
-                <div className="storeEdit__field">
-                  <label className="storeEdit__label">Banner URL</label>
-                  <input
-                    className="storeEdit__input"
-                    type="url"
-                    name="bannerUrl"
-                    value={formData.bannerUrl}
-                    onChange={handleChange}
-                    placeholder="https://..."
                   />
                 </div>
 
