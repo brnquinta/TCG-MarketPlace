@@ -157,6 +157,16 @@ npm run preview  # Preview do build
 - **Pagamentos:** Mercado Pago
 - **Banco:** MongoDB
 
+## Roadmap - Features em Desenvolvimento
+
+Funcionalidades sendo desenvolvidas no branch `integracoes`:
+
+- **Checkout e Pagamento** — Integracao completa com Mercado Pago para finalizacao de compras
+- **Sistema de Pedidos** — Criacao, acompanhamento e gestao de ordens de compra
+- **Frete** — Integracao com Melhor Envio para calculo e gestao de envios
+- **Disputas** — Sistema de contestacao entre comprador e vendedor (7 dias regular, 15 dias certificado)
+- **Repasses** — Sistema de payout para vendedors apos confirmacao de entrega
+
 ## Licenca
 
 ISC

@@ -4,6 +4,9 @@ import Listing from '../models/Listing.js'
 
 export const createStore = async (req, res) => {
   try {
+    if (!req.user) {
+      return res.status(401).json({ error: 'Unauthorized' })
+    }
     const { name, slug, logoUrl, bannerUrl, description, location } = req.body
     const clerkId = req.user.clerkId
 
@@ -50,6 +53,9 @@ export const createStore = async (req, res) => {
 
 export const getMyStore = async (req, res) => {
   try {
+    if (!req.user) {
+      return res.status(401).json({ error: 'Unauthorized' })
+    }
     const clerkId = req.user.clerkId
     const user = await User.findOne({ clerkId })
 
@@ -72,6 +78,9 @@ export const getMyStore = async (req, res) => {
 
 export const updateStore = async (req, res) => {
   try {
+    if (!req.user) {
+      return res.status(401).json({ error: 'Unauthorized' })
+    }
     const clerkId = req.user.clerkId
     const user = await User.findOne({ clerkId })
 
