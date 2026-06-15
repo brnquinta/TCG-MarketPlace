@@ -1,0 +1,105 @@
+<mxfile host="app.diagrams.net" modified="2026-05-29T10:00:00.000Z" agent="TCG-MarketPlace" version="24.0.0">
+  <diagram id="mer-diagram" name="Modelo Entidade-Relacionamento">
+    <mxGraphModel dx="1200" dy="800" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1600" pageHeight="1200" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <mxCell id="t" value="MODELO ENTIDADE-RELACIONAMENTO (MER) — MongoDB" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;fontSize=18;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="400" y="20" width="800" height="40" as="geometry" />
+        </mxCell>
+
+        <!-- ============ ENTIDADE: User ============ -->
+        <mxCell id="ent-user" value="&lt;b&gt;User&lt;/b&gt;&lt;hr&gt;&lt;font style='font-size: 11px'&gt;PK clerkId: String&lt;/font&gt;&lt;br&gt;&lt;font style='font-size: 11px'&gt;email: String (unique)&lt;/font&gt;&lt;br&gt;&lt;font style='font-size: 11px'&gt;firstName: String&lt;/font&gt;&lt;br&gt;&lt;font style='font-size: 11px'&gt;lastName: String&lt;/font&gt;&lt;br&gt;&lt;font style='font-size: 11px'&gt;imageUrl: String&lt;/font&gt;&lt;br&gt;&lt;font style='font-size: 11px'&gt;createdAt: Date&lt;/font&gt;&lt;br&gt;&lt;font style='font-size: 11px'&gt;updatedAt: Date&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E3F2FD;strokeColor=#1565C0;overflow=hidden;" vertex="1" parent="1">
+          <mxGeometry x="120" y="100" width="200" height="200" as="geometry" />
+        </mxCell>
+
+        <!-- ============ ENTIDADE: Store ============ -->
+        <mxCell id="ent-store" value="&lt;b&gt;Store&lt;/b&gt;&lt;hr&gt;&lt;font style='font-size: 11px'&gt;PK _id: ObjectId&lt;/font&gt;&lt;br&gt;&lt;font style='font-size: 11px'&gt;FK userId: ObjectId&lt;/font&gt;&lt;br&gt;&lt;font style='font-size: 11px'&gt;name: String&lt;/font&gt;&lt;br&gt;&lt;font style='font-size: 11px'&gt;slug: String (unique)&lt;/font&gt;&lt;br&gt;&lt;font style='font-size: 11px'&gt;logoUrl: String&lt;/font&gt;&lt;br&gt;&lt;font style='font-size: 11px'&gt;bannerUrl: String&lt;/font&gt;&lt;br&gt;&lt;font style='font-size: 11px'&gt;description: String&lt;/font&gt;&lt;br&gt;&lt;font style='font-size: 11px'&gt;location: {city, state}&lt;/font&gt;&lt;br&gt;&lt;font style='font-size: 11px'&gt;status: enum&lt;/font&gt;&lt;br&gt;&lt;font style='font-size: 11px'&gt;onboardingStatus: enum&lt;/font&gt;&lt;br&gt;&lt;font style='font-size: 11px'&gt;rating: {avg, count}&lt;/font&gt;&lt;br&gt;&lt;font style='font-size: 11px'&gt;stats: {listings, sales, views}&lt;/font&gt;&lt;br&gt;&lt;font style='font-size: 11px'&gt;contact: {phone, email}&lt;/font&gt;&lt;br&gt;&lt;font style='font-size: 11px'&gt;paymentInfo: {cpf, cnpj, pix}&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E8F5E9;strokeColor=#2E7D32;overflow=hidden;" vertex="1" parent="1">
+          <mxGeometry x="500" y="100" width="230" height="310" as="geometry" />
+        </mxCell>
+
+        <!-- ============ ENTIDADE: Listing ============ -->
+        <mxCell id="ent-listing" value="&lt;b&gt;Listing&lt;/b&gt;&lt;hr&gt;&lt;font style='font-size: 11px'&gt;PK _id: ObjectId&lt;/font&gt;&lt;br&gt;&lt;font style='font-size: 11px'&gt;FK storeId: ObjectId&lt;/font&gt;&lt;br&gt;&lt;font style='font-size: 11px'&gt;FK userId: ObjectId&lt;/font&gt;&lt;br&gt;&lt;font style='font-size: 11px'&gt;cardSnapshot: {&lt;/font&gt;&lt;br&gt;&lt;font style='font-size: 11px'&gt;&amp;nbsp;&amp;nbsp;cardId, name, number,&lt;/font&gt;&lt;br&gt;&lt;font style='font-size: 11px'&gt;&amp;nbsp;&amp;nbsp;rarity, image, setId...&lt;/font&gt;&lt;br&gt;&lt;font style='font-size: 11px'&gt;}&lt;/font&gt;&lt;br&gt;&lt;font style='font-size: 11px'&gt;listingData: {&lt;/font&gt;&lt;br&gt;&lt;font style='font-size: 11px'&gt;&amp;nbsp;&amp;nbsp;language, condition,&lt;/font&gt;&lt;br&gt;&lt;font style='font-size: 11px'&gt;&amp;nbsp;&amp;nbsp;price, quantity,&lt;/font&gt;&lt;br&gt;&lt;font style='font-size: 11px'&gt;&amp;nbsp;&amp;nbsp;certified, grade,&lt;/font&gt;&lt;br&gt;&lt;font style='font-size: 11px'&gt;&amp;nbsp;&amp;nbsp;shipping, defects...&lt;/font&gt;&lt;br&gt;&lt;font style='font-size: 11px'&gt;}&lt;/font&gt;&lt;br&gt;&lt;font style='font-size: 11px'&gt;photos: {front90..}&lt;/font&gt;&lt;br&gt;&lt;font style='font-size: 11px'&gt;status: enum&lt;/font&gt;&lt;br&gt;&lt;font style='font-size: 11px'&gt;views: Number&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF3E0;strokeColor=#E65100;overflow=hidden;" vertex="1" parent="1">
+          <mxGeometry x="900" y="100" width="240" height="320" as="geometry" />
+        </mxCell>
+
+        <!-- ============ ENTIDADE: Cart ============ -->
+        <mxCell id="ent-cart" value="&lt;b&gt;Cart&lt;/b&gt;&lt;hr&gt;&lt;font style='font-size: 11px'&gt;PK _id: ObjectId&lt;/font&gt;&lt;br&gt;&lt;font style='font-size: 11px'&gt;FK userId: ObjectId&lt;/font&gt;&lt;br&gt;&lt;font style='font-size: 11px'&gt;&amp;nbsp;&amp;nbsp;(unique)&lt;/font&gt;&lt;br&gt;&lt;font style='font-size: 11px'&gt;items: [{&lt;/font&gt;&lt;br&gt;&lt;font style='font-size: 11px'&gt;&amp;nbsp;&amp;nbsp;listingId,&lt;/font&gt;&lt;br&gt;&lt;font style='font-size: 11px'&gt;&amp;nbsp;&amp;nbsp;price,&lt;/font&gt;&lt;br&gt;&lt;font style='font-size: 11px'&gt;&amp;nbsp;&amp;nbsp;addedAt&lt;/font&gt;&lt;br&gt;&lt;font style='font-size: 11px'&gt;}]&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF9C4;strokeColor=#F9A825;overflow=hidden;" vertex="1" parent="1">
+          <mxGeometry x="120" y="450" width="200" height="180" as="geometry" />
+        </mxCell>
+
+        <!-- ============ ENTIDADE: Order ============ -->
+        <mxCell id="ent-order" value="&lt;b&gt;Order&lt;/b&gt;&lt;hr&gt;&lt;font style='font-size: 11px'&gt;PK _id: ObjectId&lt;/font&gt;&lt;br&gt;&lt;font style='font-size: 11px'&gt;orderNumber: String (unique)&lt;/font&gt;&lt;br&gt;&lt;font style='font-size: 11px'&gt;FK buyerId: ObjectId&lt;/font&gt;&lt;br&gt;&lt;font style='font-size: 11px'&gt;FK sellerId: ObjectId&lt;/font&gt;&lt;br&gt;&lt;font style='font-size: 11px'&gt;items: [{&lt;/font&gt;&lt;br&gt;&lt;font style='font-size: 11px'&gt;&amp;nbsp;&amp;nbsp;listingId, cardName,&lt;/font&gt;&lt;br&gt;&lt;font style='font-size: 11px'&gt;&amp;nbsp;&amp;nbsp;price, quantity&lt;/font&gt;&lt;br&gt;&lt;font style='font-size: 11px'&gt;}]&lt;/font&gt;&lt;br&gt;&lt;font style='font-size: 11px'&gt;total: Number&lt;/font&gt;&lt;br&gt;&lt;font style='font-size: 11px'&gt;status: enum&lt;/font&gt;&lt;br&gt;&lt;font style='font-size: 11px'&gt;shipping: {address...}&lt;/font&gt;&lt;br&gt;&lt;font style='font-size: 11px'&gt;payment: {method...}&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFCDD2;strokeColor=#E53935;overflow=hidden;dashed=1;" vertex="1" parent="1">
+          <mxGeometry x="500" y="460" width="230" height="250" as="geometry" />
+        </mxCell>
+
+        <!-- ============ RELACIONAMENTOS ============ -->
+
+        <!-- User 1:1 Store -->
+        <mxCell id="rel1" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#333;strokeWidth=2;" edge="1" parent="1" source="ent-user" target="ent-store">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="rel1a" value="1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#333;fontSize=11;fontStyle=1;" edge="1" parent="1" source="ent-user" target="ent-store">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="rel1b" value="1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#333;fontSize=11;fontStyle=1;" edge="1" parent="1" source="ent-store" target="ent-user">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Store 1:N Listing -->
+        <mxCell id="rel2" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#333;strokeWidth=2;" edge="1" parent="1" source="ent-store" target="ent-listing">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="rel2a" value="1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#333;fontSize=11;fontStyle=1;" edge="1" parent="1" source="ent-store" target="ent-listing">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="rel2b" value="N" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#333;fontSize=11;fontStyle=1;" edge="1" parent="1" source="ent-listing" target="ent-store">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- User 1:N Listing -->
+        <mxCell id="rel3" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#333;strokeWidth=2;" edge="1" parent="1" source="ent-user" target="ent-listing">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="rel3a" value="1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#333;fontSize=11;fontStyle=1;" edge="1" parent="1" source="ent-user" target="ent-listing">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="rel3b" value="N" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#333;fontSize=11;fontStyle=1;" edge="1" parent="1" source="ent-listing" target="ent-user">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- User 1:1 Cart -->
+        <mxCell id="rel4" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#F9A825;strokeWidth=2;" edge="1" parent="1" source="ent-user" target="ent-cart">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="rel4a" value="1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#F9A825;fontSize=11;fontStyle=1;" edge="1" parent="1" source="ent-user" target="ent-cart">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="rel4b" value="1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#F9A825;fontSize=11;fontStyle=1;" edge="1" parent="1" source="ent-cart" target="ent-user">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- User 1:N Order (buyer) -->
+        <mxCell id="rel5" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#E53935;strokeWidth=1;dashed=1;" edge="1" parent="1" source="ent-user" target="ent-order">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="rel5a" value="1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#E53935;fontSize=11;fontStyle=1;dashed=1;" edge="1" parent="1" source="ent-user" target="ent-order">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="rel5b" value="N" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#E53935;fontSize=11;fontStyle=1;dashed=1;" edge="1" parent="1" source="ent-order" target="ent-user">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- ============ LEGENDA ============ -->
+        <mxCell id="leg1" value="✅ Implementado (CRUD completo)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#C8E6C9;strokeColor=#2E7D32;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="900" y="480" width="200" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="leg3" value="❌ Modelo definido / sem controller" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFCDD2;strokeColor=#E53935;fontSize=11;dashed=1;" vertex="1" parent="1">
+          <mxGeometry x="900" y="520" width="210" height="30" as="geometry" />
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

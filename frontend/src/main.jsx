@@ -1,7 +1,8 @@
-import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { BrowserRouter } from 'react-router-dom'
 import { ClerkProvider } from '@clerk/clerk-react'
+import { StoreProvider } from './context/StoreContext.jsx'
+import { CartProvider } from './context/CartContext.jsx'
 import './index.css'
 import App from './App.jsx'
 
@@ -12,11 +13,13 @@ if (!publishableKey) {
 }
 
 createRoot(document.getElementById('root')).render(
-  <StrictMode>
-    <ClerkProvider publishableKey={publishableKey}>
-      <BrowserRouter>
-        <App />
-      </BrowserRouter>
-    </ClerkProvider>
-  </StrictMode>,
+  <ClerkProvider publishableKey={publishableKey}>
+    <BrowserRouter>
+      <StoreProvider>
+        <CartProvider>
+          <App />
+        </CartProvider>
+      </StoreProvider>
+    </BrowserRouter>
+  </ClerkProvider>
 )

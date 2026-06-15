@@ -1,0 +1,509 @@
+import { useState, useRef, useEffect } from 'react'
+import { Link } from 'react-router-dom'
+import { useStore } from '../hooks/useStore'
+import { useApiStore } from '../hooks/useApiStore'
+import { uploadAPI } from '../services/api'
+
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api'
+
+const BANNER_MIN_WIDTH = 800
+const BANNER_MIN_HEIGHT = 200
+const LOGO_MIN_SIZE = 100
+
+function StoreEdit() {
+  const { store, updateStore } = useStore()
+  const { fetchListingsFromBackend, deleteListingOnBackend } = useApiStore()
+
+  const [isEditing, setIsEditing] = useState(false)
+  const [bannerError, setBannerError] = useState('')
+  const [logoError, setLogoError] = useState('')
+  const [storeStatus, setStoreStatus] = useState(store.status || 'active')
+  const [saving, setSaving] = useState(false)
+  const [uploadingBanner, setUploadingBanner] = useState(false)
+  const [uploadingLogo, setUploadingLogo] = useState(false)
+  const [listings, setListings] = useState([])
+  const [listingsLoading, setListingsLoading] = useState(true)
+  const bannerInputRef = useRef(null)
+  const logoInputRef = useRef(null)
+  const [formData, setFormData] = useState({
+    name: store.name,
+    slug: store.slug,
+    logoUrl: store.logoUrl,
+    bannerUrl: store.bannerUrl,
+    description: store.description,
+    city: store.location.city,
+    state: store.location.state,
+  })
+
+  useEffect(() => {
+    async function loadListings() {
+      try {
+        const data = await fetchListingsFromBackend()
+        setListings(data)
+      } catch (err) {
+        console.error('Erro ao buscar anuncios:', err)
+      } finally {
+        setListingsLoading(false)
+      }
+    }
+
+    if (store) {
+      loadListings()
+    }
+  }, [store, fetchListingsFromBackend])
+
+  const handleDeleteListing = async (listingId) => {
+    if (!confirm('Tem certeza que deseja excluir este anuncio?')) return
+    try {
+      await deleteListingOnBackend(listingId)
+      setListings((prev) => prev.filter((l) => l._id !== listingId))
+    } catch (err) {
+      console.error('Erro ao excluir:', err)
+    }
+  }
+
+  const getStatusLabel = (status) => {
+    const map = { active: 'Ativo', draft: 'Rascunho', sold: 'Vendido', inactive: 'Inativo', removed: 'Removido' }
+    return map[status] || status
+  }
+
+  const getStatusClass = (status) => {
+    const map = {
+      active: 'store-dashboard__listing-status--active',
+      draft: 'store-dashboard__listing-status--draft',
+      sold: 'store-dashboard__listing-status--sold',
+      inactive: 'store-dashboard__listing-status--inactive',
+    }
+    return map[status] || ''
+  }
+
+  const handleChange = (e) => {
+    const { name, value } = e.target
+    setFormData((prev) => ({ ...prev, [name]: value }))
+  }
+
+  const handleSave = async () => {
+    setSaving(true)
+    try {
+      await updateStore({
+        name: formData.name,
+        slug: formData.slug,
+        logoUrl: formData.logoUrl,
+        bannerUrl: formData.bannerUrl,
+        description: formData.description,
+        status: storeStatus,
+        city: formData.city,
+        state: formData.state,
+      })
+      setIsEditing(false)
+    } catch (err) {
+      console.error('Erro ao salvar loja:', err)
+      alert('Erro ao salvar. Tente novamente.')
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  const handleCancel = () => {
+    setFormData({
+      name: store.name,
+      slug: store.slug,
+      logoUrl: store.logoUrl,
+      bannerUrl: store.bannerUrl,
+      description: store.description,
+      city: store.location.city,
+      state: store.location.state,
+    })
+    setStoreStatus(store.status || 'active')
+    setIsEditing(false)
+  }
+
+  const validateImage = (file, minWidth, minHeight, isBanner = false) => {
+    return new Promise((resolve) => {
+      const img = new Image()
+      img.onload = () => {
+        if (img.width >= minWidth && img.height >= minHeight) {
+          resolve({ valid: true })
+        } else {
+          const hint = isBanner
+            ? 'Recomendamos uma imagem grande (pelo menos 800x200px) para cobrir toda a largura.'
+            : 'Recomendamos uma imagem quadrada (pelo menos 100x100px).'
+          resolve({
+            valid: false,
+            message: `Tamanho atual: ${img.width}x${img.height}px. ${hint}`,
+          })
+        }
+      }
+      img.onerror = () => {
+        resolve({ valid: false, message: 'Erro ao carregar a imagem. Tente outro arquivo.' })
+      }
+      img.src = URL.createObjectURL(file)
+    })
+  }
+
+  const handleBannerClick = () => {
+    bannerInputRef.current?.click()
+  }
+
+  const handleLogoClick = () => {
+    logoInputRef.current?.click()
+  }
+
+  const handleBannerChange = async (e) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    const result = await validateImage(file, BANNER_MIN_WIDTH, BANNER_MIN_HEIGHT, true)
+    if (!result.valid) {
+      setBannerError(result.message)
+      return
+    }
+
+    setBannerError('')
+    setUploadingBanner(true)
+    try {
+      const data = await uploadAPI.uploadStoreImage(file)
+      const fullUrl = `${API_URL.replace(/\/api$/, '')}${data.url}`
+      setFormData((prev) => ({ ...prev, bannerUrl: fullUrl }))
+    } catch (err) {
+      console.error('Erro ao enviar banner:', err)
+      setBannerError('Erro ao enviar imagem. Tente novamente.')
+    } finally {
+      setUploadingBanner(false)
+    }
+  }
+
+  const handleLogoChange = async (e) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    const result = await validateImage(file, LOGO_MIN_SIZE, LOGO_MIN_SIZE, false)
+    if (!result.valid) {
+      setLogoError(result.message)
+      return
+    }
+
+    setLogoError('')
+    setUploadingLogo(true)
+    try {
+      const data = await uploadAPI.uploadStoreImage(file)
+      const fullUrl = `${API_URL.replace(/\/api$/, '')}${data.url}`
+      setFormData((prev) => ({ ...prev, logoUrl: fullUrl }))
+    } catch (err) {
+      console.error('Erro ao enviar logo:', err)
+      setLogoError('Erro ao enviar imagem. Tente novamente.')
+    } finally {
+      setUploadingLogo(false)
+    }
+  }
+
+  const listingsCount = store.stats?.activeListings || 0
+
+  return (
+    <section className="storeEdit">
+      <div className="storeEdit__banner">
+        {formData.bannerUrl ? (
+          <img
+            className="storeEdit__banner-image"
+            src={formData.bannerUrl}
+            alt={`Banner da loja ${formData.name}`}
+          />
+        ) : (
+          <div className="storeEdit__banner-placeholder" />
+        )}
+        <button
+          className="storeEdit__banner-edit"
+          type="button"
+          onClick={handleBannerClick}
+          disabled={uploadingBanner}
+        >
+          {uploadingBanner ? 'Enviando...' : 'Editar banner'}
+        </button>
+        <input
+          ref={bannerInputRef}
+          type="file"
+          accept="image/*"
+          onChange={handleBannerChange}
+          style={{ display: 'none' }}
+        />
+        {bannerError && (
+          <p className="storeEdit__error">{bannerError}</p>
+        )}
+      </div>
+
+      <div className="storeEdit__header">
+        <div className="storeEdit__identity">
+          <div className="storeEdit__logo-wrapper">
+            {formData.logoUrl ? (
+              <img
+                className="storeEdit__logo"
+                src={formData.logoUrl}
+                alt={`Logo da loja ${formData.name}`}
+              />
+            ) : (
+              <div className="storeEdit__logo-placeholder">
+                {formData.name.charAt(0)}
+              </div>
+            )}
+            <button
+              className="storeEdit__logo-edit"
+              type="button"
+              onClick={handleLogoClick}
+              disabled={uploadingLogo}
+            >
+              {uploadingLogo ? 'Enviando...' : 'Editar'}
+            </button>
+            <input
+              ref={logoInputRef}
+              type="file"
+              accept="image/*"
+              onChange={handleLogoChange}
+              style={{ display: 'none' }}
+            />
+            {logoError && (
+              <p className="storeEdit__error storeEdit__error--logo">{logoError}</p>
+            )}
+          </div>
+
+          <div className="storeEdit__info">
+            <h1 className="storeEdit__title">{formData.name}</h1>
+            <p className="storeEdit__slug">@{formData.slug}</p>
+            <p className="storeEdit__location">
+              {formData.city} - {formData.state}
+            </p>
+          </div>
+        </div>
+
+        <div className="storeEdit__stats">
+          <div className="storeEdit__stat">
+            <span className="storeEdit__stat-value">{listingsCount}</span>
+            <span className="storeEdit__stat-label">Anúncios</span>
+          </div>
+
+          <div className="storeEdit__stat">
+            <span className="storeEdit__stat-value">0</span>
+            <span className="storeEdit__stat-label">Vendas</span>
+          </div>
+
+          <div className="storeEdit__stat">
+            <span className="storeEdit__stat-value storeEdit__stat-value--rating">
+              <span className="storeEdit__rating-star">★</span>
+              0
+            </span>
+            <span className="storeEdit__stat-label">0 avaliações</span>
+          </div>
+        </div>
+      </div>
+
+      <div className="storeEdit__content">
+        <aside className="storeEdit__sidebar">
+          {isEditing ? (
+            <div className="storeEdit__card">
+              <h2 className="storeEdit__section-title">Editar loja</h2>
+
+              <div className="storeEdit__form">
+                <div className="storeEdit__field">
+                  <label className="storeEdit__label">Nome</label>
+                  <input
+                    className="storeEdit__input"
+                    type="text"
+                    name="name"
+                    value={formData.name}
+                    onChange={handleChange}
+                  />
+                </div>
+
+                <div className="storeEdit__field">
+                  <label className="storeEdit__label">Slug</label>
+                  <input
+                    className="storeEdit__input"
+                    type="text"
+                    name="slug"
+                    value={formData.slug}
+                    onChange={handleChange}
+                  />
+                </div>
+
+                <div className="storeEdit__field">
+                  <label className="storeEdit__label">Descrição</label>
+                  <textarea
+                    className="storeEdit__textarea"
+                    name="description"
+                    value={formData.description}
+                    onChange={handleChange}
+                    rows="4"
+                  />
+                </div>
+
+                <div className="storeEdit__field">
+                  <label className="storeEdit__label">Cidade</label>
+                  <input
+                    className="storeEdit__input"
+                    type="text"
+                    name="city"
+                    value={formData.city}
+                    onChange={handleChange}
+                  />
+                </div>
+
+                <div className="storeEdit__field">
+                  <label className="storeEdit__label">Estado</label>
+                  <input
+                    className="storeEdit__input"
+                    type="text"
+                    name="state"
+                    value={formData.state}
+                    onChange={handleChange}
+                  />
+                </div>
+
+                <div className="storeEdit__field">
+                  <label className="storeEdit__label">Status da loja</label>
+                  <select
+                    className="storeEdit__input"
+                    value={storeStatus}
+                    onChange={(e) => setStoreStatus(e.target.value)}
+                  >
+                    <option value="active">Ativa</option>
+                    <option value="inactive">Inativa</option>
+                  </select>
+                </div>
+
+                <div className="storeEdit__form-actions">
+                  <button
+                    className="storeEdit__btn storeEdit__btn--primary"
+                    type="button"
+                    onClick={handleSave}
+                    disabled={saving}
+                  >
+                    {saving ? 'Salvando...' : 'Salvar'}
+                  </button>
+                  <button
+                    className="storeEdit__btn storeEdit__btn--secondary"
+                    type="button"
+                    onClick={handleCancel}
+                    disabled={saving}
+                  >
+                    Cancelar
+                  </button>
+                </div>
+              </div>
+            </div>
+          ) : (
+            <>
+              <div className="storeEdit__card">
+                <div className="storeEdit__card-header">
+                  <h2 className="storeEdit__section-title">Sobre a loja</h2>
+                  <button
+                    className="storeEdit__edit-btn"
+                    type="button"
+                    onClick={() => setIsEditing(true)}
+                  >
+                    Editar
+                  </button>
+                </div>
+                <p className="storeEdit__description">{formData.description}</p>
+              </div>
+
+              <div className="storeEdit__card">
+                <h2 className="storeEdit__section-title">Informações</h2>
+                <ul className="storeEdit__details">
+                  <li className="storeEdit__detail-item">
+                    <span className="storeEdit__detail-label">Cidade</span>
+                    <span className="storeEdit__detail-value">{formData.city}</span>
+                  </li>
+                  <li className="storeEdit__detail-item">
+                    <span className="storeEdit__detail-label">Estado</span>
+                    <span className="storeEdit__detail-value">{formData.state}</span>
+                  </li>
+                  <li className="storeEdit__detail-item">
+                    <span className="storeEdit__detail-label">Status</span>
+                    <span className="storeEdit__detail-value">
+                      {storeStatus === 'active' ? 'Ativa' : 'Inativa'}
+                    </span>
+                  </li>
+                </ul>
+              </div>
+            </>
+          )}
+        </aside>
+
+        <div className="storeEdit__main">
+          <div className="storeEdit__main-header">
+            <h2 className="storeEdit__section-title">Anúncios da loja</h2>
+            <Link to="/new-listing" className="store-edit__new-listing-btn">
+              Novo anúncio
+            </Link>
+          </div>
+
+          {listingsLoading ? (
+            <p className="storeEdit__empty-text">Carregando anúncios...</p>
+          ) : listings.length > 0 ? (
+            <div className="store-dashboard__listings">
+              {listings.map((listing) => (
+                <article key={listing._id} className="store-dashboard__listing-card">
+                  <Link
+                    to={`/listing/${listing._id}`}
+                    className="store-dashboard__listing-image"
+                  >
+                    <img
+                      src={listing.cardSnapshot?.imageSmall}
+                      alt={listing.cardSnapshot?.name}
+                    />
+                  </Link>
+
+                  <div className="store-dashboard__listing-info">
+                    <Link
+                      to={`/listing/${listing._id}`}
+                      className="store-dashboard__listing-name"
+                    >
+                      {listing.cardSnapshot?.name}
+                    </Link>
+                    <p className="store-dashboard__listing-meta">
+                      {listing.cardSnapshot?.setName} &bull; #{listing.cardSnapshot?.number} &bull; {listing.listingData?.condition}
+                    </p>
+                  </div>
+
+                  <div className="store-dashboard__listing-right">
+                    <p className="store-dashboard__listing-price">
+                      R$ {listing.listingData?.price?.toFixed(2)}
+                    </p>
+                    <span className={`store-dashboard__listing-status ${getStatusClass(listing.status)}`}>
+                      {getStatusLabel(listing.status)}
+                    </span>
+                    <div className="store-dashboard__listing-actions">
+                      <Link
+                        to={`/listing/${listing._id}`}
+                        className="store-dashboard__listing-action store-dashboard__listing-action--view"
+                      >
+                        Ver
+                      </Link>
+                      <button
+                        className="store-dashboard__listing-action store-dashboard__listing-action--delete"
+                        onClick={() => handleDeleteListing(listing._id)}
+                      >
+                        Excluir
+                      </button>
+                    </div>
+                  </div>
+                </article>
+              ))}
+            </div>
+          ) : (
+            <div className="storeEdit__empty">
+              <h3 className="storeEdit__empty-title">Nenhum anúncio disponível</h3>
+              <p className="storeEdit__empty-text">
+                Esta loja ainda não possui cartas anunciadas.
+              </p>
+              <Link to="/new-listing" className="storeEdit__create-btn">
+                Criar primeiro anúncio
+              </Link>
+            </div>
+          )}
+        </div>
+      </div>
+    </section>
+  )
+}
+
+export default StoreEdit

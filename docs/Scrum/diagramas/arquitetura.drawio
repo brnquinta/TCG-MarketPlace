@@ -1,0 +1,143 @@
+<mxfile host="app.diagrams.net" modified="2026-05-29T10:00:00.000Z" agent="TCG-MarketPlace" version="24.0.0">
+  <diagram id="arquitetura" name="Arquitetura do Sistema">
+    <mxGraphModel dx="1200" dy="800" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1600" pageHeight="1200" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <mxCell id="t" value="ARQUITETURA DO SISTEMA — TCG Marketplace" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;fontSize=18;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="400" y="20" width="800" height="40" as="geometry" />
+        </mxCell>
+
+        <!-- ============ CAMADA 1: CLIENTE ============ -->
+        <mxCell id="layer1" value="CAMADA 1 — Cliente (Browser)" style="text;html=1;strokeColor=none;fillColor=#E3F2FD;align=center;verticalAlign=middle;whiteSpace=wrap;fontSize=14;fontStyle=1;rounded=1;" vertex="1" parent="1">
+          <mxGeometry x="80" y="90" width="1400" height="30" as="geometry" />
+        </mxCell>
+
+        <!-- React App -->
+        <mxCell id="react-app" value="&lt;b&gt;React SPA (Vite)&lt;/b&gt;&lt;hr&gt;&lt;font style='font-size: 11px'&gt;React 19 + React Router 7&lt;/font&gt;&lt;br&gt;&lt;font style='font-size: 11px'&gt;Tailwind CSS 4 + CSS BEM&lt;/font&gt;&lt;br&gt;&lt;font style='font-size: 11px'&gt;Porta 5173 (dev)&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E3F2FD;strokeColor=#1565C0;overflow=hidden;" vertex="1" parent="1">
+          <mxGeometry x="100" y="130" width="220" height="120" as="geometry" />
+        </mxCell>
+
+        <!-- Componentes -->
+        <mxCell id="comp-box" value="&lt;b&gt;Componentes&lt;/b&gt;&lt;hr&gt;&lt;font style='font-size: 11px'&gt;12 Páginas&lt;/font&gt;&lt;br&gt;&lt;font style='font-size: 11px'&gt;3 Context Providers&lt;/font&gt;&lt;br&gt;&lt;font style='font-size: 11px'&gt;3 Custom Hooks&lt;/font&gt;&lt;br&gt;&lt;font style='font-size: 11px'&gt;ProtectedRoute&lt;/font&gt;&lt;br&gt;&lt;font style='font-size: 11px'&gt;MainLayout&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E3F2FD;strokeColor=#1565C0;overflow=hidden;" vertex="1" parent="1">
+          <mxGeometry x="370" y="130" width="200" height="120" as="geometry" />
+        </mxCell>
+
+        <!-- Services -->
+        <mxCell id="services-box" value="&lt;b&gt;Services&lt;/b&gt;&lt;hr&gt;&lt;font style='font-size: 11px'&gt;api.js (fetch + JWT)&lt;/font&gt;&lt;br&gt;&lt;font style='font-size: 11px'&gt;pokemonTcg.js (axios)&lt;/font&gt;&lt;br&gt;&lt;font style='font-size: 11px'&gt;authAPI, storeAPI,&lt;/font&gt;&lt;br&gt;&lt;font style='font-size: 11px'&gt;listingAPI&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E3F2FD;strokeColor=#1565C0;overflow=hidden;" vertex="1" parent="1">
+          <mxGeometry x="620" y="130" width="200" height="120" as="geometry" />
+        </mxCell>
+
+        <!-- Utils -->
+        <mxCell id="utils-box" value="&lt;b&gt;Utils / Dados&lt;/b&gt;&lt;hr&gt;&lt;font style='font-size: 11px'&gt;cardConditions.js&lt;/font&gt;&lt;br&gt;&lt;font style='font-size: 11px'&gt;cardLanguages.js&lt;/font&gt;&lt;br&gt;&lt;font style='font-size: 11px'&gt;brazilianStates.js&lt;/font&gt;&lt;br&gt;&lt;font style='font-size: 11px'&gt;assets, blocks CSS&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E3F2FD;strokeColor=#1565C0;overflow=hidden;" vertex="1" parent="1">
+          <mxGeometry x="870" y="130" width="200" height="120" as="geometry" />
+        </mxCell>
+
+        <!-- Clerk -->
+        <mxCell id="clerk-front" value="&lt;b&gt;Clerk Auth&lt;/b&gt;&lt;hr&gt;&lt;font style='font-size: 11px'&gt;SignIn / SignUp&lt;/font&gt;&lt;br&gt;&lt;font style='font-size: 11px'&gt;UserButton&lt;/font&gt;&lt;br&gt;&lt;font style='font-size: 11px'&gt;JWT Session Token&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E8F5E9;strokeColor=#2E7D32;overflow=hidden;" vertex="1" parent="1">
+          <mxGeometry x="1120" y="130" width="200" height="120" as="geometry" />
+        </mxCell>
+
+        <!-- ============ SETA: Frontend → Backend ============ -->
+        <mxCell id="arrow-fe-be" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#333;strokeWidth=2;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="780" y="260" as="sourcePoint" />
+            <mxPoint x="780" y="320" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="arrow-fe-be-l" value="fetch (Bearer JWT)" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;fontSize=11;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="720" y="270" width="120" height="20" as="geometry" />
+        </mxCell>
+
+        <!-- ============ CAMADA 2: BACKEND ============ -->
+        <mxCell id="layer2" value="CAMADA 2 — Servidor (Node.js)" style="text;html=1;strokeColor=none;fillColor=#F3E5F5;align=center;verticalAlign=middle;whiteSpace=wrap;fontSize=14;fontStyle=1;rounded=1;" vertex="1" parent="1">
+          <mxGeometry x="80" y="310" width="1400" height="30" as="geometry" />
+        </mxCell>
+
+        <!-- Express Server -->
+        <mxCell id="express" value="&lt;b&gt;Express 4 Server&lt;/b&gt;&lt;hr&gt;&lt;font style='font-size: 11px'&gt;Porta 3001&lt;/font&gt;&lt;br&gt;&lt;font style='font-size: 11px'&gt;Middleware: Helmet, CORS, Morgan&lt;/font&gt;&lt;br&gt;&lt;font style='font-size: 11px'&gt;JSON Body Parser&lt;/font&gt;&lt;br&gt;&lt;font style='font-size: 11px'&gt;Global Error Handler&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F3E5F5;strokeColor=#7B1FA2;overflow=hidden;" vertex="1" parent="1">
+          <mxGeometry x="100" y="350" width="220" height="130" as="geometry" />
+        </mxCell>
+
+        <!-- Auth Middleware -->
+        <mxCell id="auth-mid" value="&lt;b&gt;Auth Middleware&lt;/b&gt;&lt;hr&gt;&lt;font style='font-size: 11px'&gt;authenticateToken&lt;/font&gt;&lt;br&gt;&lt;font style='font-size: 11px'&gt;optionalAuth&lt;/font&gt;&lt;br&gt;&lt;font style='font-size: 11px'&gt;⚠️ jwt.decode()&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF9C4;strokeColor=#F9A825;overflow=hidden;" vertex="1" parent="1">
+          <mxGeometry x="370" y="350" width="200" height="130" as="geometry" />
+        </mxClick>
+
+        <!-- Routes / Controllers -->
+        <mxCell id="routes-box" value="&lt;b&gt;Routes + Controllers&lt;/b&gt;&lt;hr&gt;&lt;font style='font-size: 11px'&gt;7 arquivos de rota&lt;/font&gt;&lt;br&gt;&lt;font style='font-size: 11px'&gt;5 controllers&lt;/font&gt;&lt;br&gt;&lt;font style='font-size: 11px'&gt;20 endpoints REST&lt;/font&gt;&lt;br&gt;&lt;font style='font-size: 11px'&gt;Auth / Store / Listing&lt;/font&gt;&lt;br&gt;&lt;font style='font-size: 11px'&gt;Cart / Webhook / Debug&lt;/font&gt;&lt;br&gt;&lt;font style='font-size: 11px'&gt;Pokémon TCG Proxy&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F3E5F5;strokeColor=#7B1FA2;overflow=hidden;" vertex="1" parent="1">
+          <mxGeometry x="620" y="350" width="220" height="130" as="geometry" />
+        </mxCell>
+
+        <!-- Mongoose Models -->
+        <mxCell id="models-box" value="&lt;b&gt;Mongoose Models (ODM)&lt;/b&gt;&lt;hr&gt;&lt;font style='font-size: 11px'&gt;User ✅&lt;/font&gt;&lt;br&gt;&lt;font style='font-size: 11px'&gt;Store ✅&lt;/font&gt;&lt;br&gt;&lt;font style='font-size: 11px'&gt;Listing ✅&lt;/font&gt;&lt;br&gt;&lt;font style='font-size: 11px'&gt;Cart ✅&lt;/font&gt;&lt;br&gt;&lt;font style='font-size: 11px'&gt;Order ❌ (modelo ok)&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFCDD2;strokeColor=#E53935;overflow=hidden;" vertex="1" parent="1">
+          <mxGeometry x="890" y="350" width="200" height="130" as="geometry" />
+        </mxCell>
+
+        <!-- ============ CAMADA 3: DADOS ============ -->
+        <mxCell id="layer3" value="CAMADA 3 — Armazenamento e APIs Externas" style="text;html=1;strokeColor=none;fillColor=#E0E0E0;align=center;verticalAlign=middle;whiteSpace=wrap;fontSize=14;fontStyle=1;rounded=1;" vertex="1" parent="1">
+          <mxGeometry x="80" y="520" width="1400" height="30" as="geometry" />
+        </mxCell>
+
+        <!-- MongoDB -->
+        <mxCell id="mongo" value="&lt;b&gt;MongoDB&lt;/b&gt;&lt;hr&gt;&lt;font style='font-size: 11px'&gt;5 coleções&lt;/font&gt;&lt;br&gt;&lt;font style='font-size: 11px'&gt;users, stores&lt;/font&gt;&lt;br&gt;&lt;font style='font-size: 11px'&gt;listings, carts&lt;/font&gt;&lt;br&gt;&lt;font style='font-size: 11px'&gt;orders (futuro)&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E0E0E0;strokeColor=#616161;overflow=hidden;" vertex="1" parent="1">
+          <mxGeometry x="100" y="560" width="220" height="120" as="geometry" />
+        </mxCell>
+
+        <!-- Pokémon TCG Data -->
+        <mxCell id="tcg-data" value="&lt;b&gt;Pokémon TCG Data&lt;/b&gt;&lt;hr&gt;&lt;font style='font-size: 11px'&gt;JSON local&lt;/font&gt;&lt;br&gt;&lt;font style='font-size: 11px'&gt;cards.json (5 sets)&lt;/font&gt;&lt;br&gt;&lt;font style='font-size: 11px'&gt;sets.json&lt;/font&gt;&lt;br&gt;&lt;font style='font-size: 11px'&gt;rarities.json&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E0E0E0;strokeColor=#616161;overflow=hidden;" vertex="1" parent="1">
+          <mxGeometry x="370" y="560" width="220" height="120" as="geometry" />
+        </mxCell>
+
+        <!-- AwesomeAPI -->
+        <mxCell id="awesome-api" value="&lt;b&gt;AwesomeAPI&lt;/b&gt;&lt;hr&gt;&lt;font style='font-size: 11px'&gt;economia.awesomeapi&lt;/font&gt;&lt;br&gt;&lt;font style='font-size: 11px'&gt;USD → BRL&lt;/font&gt;&lt;br&gt;&lt;font style='font-size: 11px'&gt;Cotação em tempo real&lt;/font&gt;&lt;br&gt;&lt;font style='font-size: 11px'&gt;Fallback: 5.8&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E0E0E0;strokeColor=#616161;overflow=hidden;" vertex="1" parent="1">
+          <mxGeometry x="640" y="560" width="220" height="120" as="geometry" />
+        </mxCell>
+
+        <!-- Clerk Backend -->
+        <mxCell id="clerk-back" value="&lt;b&gt;Clerk API&lt;/b&gt;&lt;hr&gt;&lt;font style='font-size: 11px'&gt;Webhooks&lt;/font&gt;&lt;br&gt;&lt;font style='font-size: 11px'&gt;JWT tokens&lt;/font&gt;&lt;br&gt;&lt;font style='font-size: 11px'&gt;Gerenciamento&lt;/font&gt;&lt;br&gt;&lt;font style='font-size: 11px'&gt;de usuários&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E0E0E0;strokeColor=#616161;overflow=hidden;" vertex="1" parent="1">
+          <mxGeometry x="910" y="560" width="220" height="120" as="geometry" />
+        </mxCell>
+
+        <!-- ============ SETAS: Backend → Dados ============ -->
+        <mxCell id="a-mongo" value="Mongoose" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#7B1FA2;strokeWidth=1;fontSize=11;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="210" y="480" as="sourcePoint" />
+            <mxPoint x="210" y="560" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="a-tcg" value="JSON" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#7B1FA2;strokeWidth=1;fontSize=11;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="480" y="480" as="sourcePoint" />
+            <mxPoint x="480" y="560" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="a-awesome" value="Axios" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#7B1FA2;strokeWidth=1;fontSize=11;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="750" y="480" as="sourcePoint" />
+            <mxPoint x="750" y="560" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="a-clerk" value="Webhook" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#7B1FA2;strokeWidth=1;fontSize=11;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="1020" y="480" as="sourcePoint" />
+            <mxPoint x="1020" y="560" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+
+        <!-- ============ LEGENDA ============ -->
+        <mxCell id="leg-end" value="✅ Pronto" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#E3F2FD;strokeColor=#1565C0;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="100" y="720" width="100" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="leg-warn" value="⚠️ Requer atenção" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFF9C4;strokeColor=#F9A825;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="230" y="720" width="130" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="leg-fail" value="❌ Incompleto" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFCDD2;strokeColor=#E53935;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="390" y="720" width="110" height="30" as="geometry" />
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

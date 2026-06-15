@@ -1,7 +1,10 @@
 import { Link } from 'react-router-dom'
 import { SignedIn, SignedOut, SignInButton, UserButton } from '@clerk/clerk-react'
+import { useStore } from '../hooks/useStore'
 
 function MainLayout({ children }) {
+  const { hasStore, loading: storeLoading } = useStore()
+
   return (
     <div className="main-layout">
       <header className="main-layout__header">
@@ -11,9 +14,20 @@ function MainLayout({ children }) {
           </Link>
           <div className="main-layout__nav-links">
             <Link to="/search" className="main-layout__nav-link">Buscar cartas</Link>
+            <Link to="/anuncios" className="main-layout__nav-link">Anuncios</Link>
             <SignedIn>
-              <Link to="/dashboard" className="main-layout__nav-link">Minha loja</Link>
+              {!storeLoading && (
+                <Link 
+                  to={hasStore ? "/dashboard" : "/store/create"} 
+                  className="main-layout__nav-link"
+                >
+                  {hasStore ? "Minha Loja" : "Criar Loja"}
+                </Link>
+              )}
               <Link to="/new-listing" className="main-layout__nav-link">Anunciar carta</Link>
+              <Link to="/cart" className="main-layout__nav-link">
+                Carrinho
+              </Link>
               <UserButton />
             </SignedIn>
             <SignedOut>

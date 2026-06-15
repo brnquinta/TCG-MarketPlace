@@ -1,16 +1,55 @@
-# React + Vite
+# TCG Marketplace - Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Aplicacao React para o marketplace de cartas colecionaveis.
 
-Currently, two official plugins are available:
+## Stack
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- React 19
+- Vite
+- React Router DOM
+- Tailwind CSS
+- Clerk (autenticacao)
 
-## React Compiler
+## Instalacao
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+```bash
+npm install
+```
 
-## Expanding the ESLint configuration
+## Configuracao
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+Copie o arquivo `.env.example` para `.env` e configure as variaveis:
+
+```bash
+cp .env.example .env
+```
+
+## Executar
+
+```bash
+# Desenvolvimento
+npm run dev
+
+# Build de producao
+npm run build
+
+# Preview do build
+npm run preview
+
+# Lint
+npm run lint
+```
+
+## Estrutura
+
+```
+src/
+├── blocks/          # Componentes de pagina com CSS proprio
+├── components/      # Componentes reutilizaveis
+├── context/         # React Context (Store, Cart, User)
+├── hooks/           # Custom hooks (useStore, useApiStore, useCardSearch)
+├── layouts/         # Layouts de pagina
+├── pages/           # Paginas da aplicacao
+├── services/        # Camada de API (api.js, pokemonTcg.js)
+└── utils/           # Utilitarios (estados, condicoes, idiomas)
+```
