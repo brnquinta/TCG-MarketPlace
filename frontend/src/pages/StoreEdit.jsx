@@ -166,7 +166,7 @@ function StoreEdit() {
       const fullUrl = `${API_URL.replace(/\/api$/, '')}${data.url}`
       setFormData((prev) => ({ ...prev, bannerUrl: fullUrl }))
     } catch (err) {
-      console.error('Erro ao上传 banner:', err)
+      console.error('Erro ao enviar banner:', err)
       setBannerError('Erro ao enviar imagem. Tente novamente.')
     } finally {
       setUploadingBanner(false)

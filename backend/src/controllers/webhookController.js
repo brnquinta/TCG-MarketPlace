@@ -11,7 +11,7 @@ export async function handleClerkWebhook(req, res) {
   const hasValidSecret = secret && !secret.includes('your_')
   
   if (isDev || !hasValidSecret) {
-    console.log('Modo desenvolvimento: assinatura ignorada')
+    // Em desenvolvimento, assinatura ignorada
   } else {
     let signature = req.headers['clerk-signature']
     
@@ -38,8 +38,6 @@ export async function handleClerkWebhook(req, res) {
 
   const { type, data } = req.body
 
-  console.log(`Webhook Clerk recebido: ${type}`)
-
   try {
     switch (type) {
       case 'user.created':
@@ -52,7 +50,7 @@ export async function handleClerkWebhook(req, res) {
         await handleUserDeleted(data)
         break
       default:
-        console.log(`Evento Clerk nao tratado: ${type}`)
+        // Evento nao tratado
     }
 
     res.json({ success: true })
@@ -66,7 +64,6 @@ async function handleUserCreated(data) {
   const user = await User.findOne({ clerkId: data.id })
   
   if (user) {
-    console.log(`Usuario ${data.id} ja existe`)
     return
   }
 
@@ -79,14 +76,12 @@ async function handleUserCreated(data) {
   })
 
   await newUser.save()
-  console.log(`Usuario criado: ${data.id} - ${newUser.email}`)
 }
 
 async function handleUserUpdated(data) {
   const user = await User.findOne({ clerkId: data.id })
   
   if (!user) {
-    console.log(`Usuario ${data.id} nao encontrado para atualizar`)
     return
   }
 
@@ -96,19 +91,16 @@ async function handleUserUpdated(data) {
   user.imageUrl = data.image_url || user.imageUrl
 
   await user.save()
-  console.log(`Usuario atualizado: ${data.id}`)
 }
 
 async function handleUserDeleted(data) {
   const user = await User.findOne({ clerkId: data.id })
   
   if (!user) {
-    console.log(`Usuario ${data.id} nao encontrado para deletar`)
     return
   }
 
   await user.deleteOne()
-  console.log(`Usuario deletado: ${data.id}`)
 }
 
 export async function syncUserFromClerk(clerkId) {

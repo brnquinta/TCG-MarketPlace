@@ -8,8 +8,6 @@ const router = Router()
 
 
 router.get('/cards', async (req, res) => {
-  console.log('ROTA LOCAL /cards')
-
   const {
     q = '',
     page = 1,
@@ -18,9 +16,6 @@ router.get('/cards', async (req, res) => {
 
   let filteredCards = [...cardsData.data]
 
-  console.log('QUERY:', q)
-
-  // FILTRO NAME
   const nameMatch = q.match(/name:(.+?)\*/)
 
   if (nameMatch) {
@@ -94,9 +89,6 @@ router.get('/cards', async (req, res) => {
 })
 
 router.get('/cards/:id', async (req, res) => {
-
-  console.log('ROTA LOCAL /cards/:id')
-
   const card = cardsData.data.find(
     (item) => item.id === req.params.id
   )
@@ -113,16 +105,10 @@ router.get('/cards/:id', async (req, res) => {
 })
 
 router.get('/sets', async (req, res) => {
-
-  console.log('ROTA LOCAL /sets')
-
   return res.json(setsData)
 })
 
 router.get('/rarities', async (req, res) => {
-
-  console.log('ROTA LOCAL /rarities')
-
   return res.json(raritiesData)
 })
 

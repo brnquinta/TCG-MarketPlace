@@ -3,12 +3,6 @@ const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api'
 async function request(url, options = {}) {
   const token = await window.Clerk?.session?.getToken()
 
-  console.log('[API] REQUEST →', {
-    url: `${API_URL}${url}`,
-    method: options.method || 'GET',
-    body: options.body ? JSON.parse(options.body) : null,
-  })
-
   const res = await fetch(`${API_URL}${url}`, {
     ...options,
     headers: {
@@ -18,11 +12,7 @@ async function request(url, options = {}) {
     },
   })
 
-  console.log('[API] RESPONSE STATUS →', res.status)
-
   const rawText = await res.clone().text()
-
-  console.log('[API] RAW RESPONSE →', rawText)
 
   if (!res.ok) {
     let error = {}
@@ -30,17 +20,13 @@ async function request(url, options = {}) {
     try {
       error = JSON.parse(rawText)
     } catch (e) {
-      console.log('[API] response is not JSON')
+      // ignore parse error
     }
-
-    console.error('[API] ERROR RESPONSE →', error)
 
     throw new Error(error.message || 'Erro na requisição')
   }
 
   const data = JSON.parse(rawText)
-
-  console.log('[API] SUCCESS →', data)
 
   return data
 }
@@ -99,8 +85,6 @@ export const uploadAPI = {
   uploadListingPhotos: async (formData) => {
     const token = await window.Clerk?.session?.getToken()
 
-    console.log('[API] UPLOAD →', { url: `${API_URL}/uploads/listing-photos` })
-
     const res = await fetch(`${API_URL}/uploads/listing-photos`, {
       method: 'POST',
       headers: {
@@ -109,19 +93,15 @@ export const uploadAPI = {
       body: formData,
     })
 
-    console.log('[API] UPLOAD STATUS →', res.status)
-
     const rawText = await res.clone().text()
-    console.log('[API] UPLOAD RESPONSE →', rawText)
 
     if (!res.ok) {
       let error = {}
       try {
         error = JSON.parse(rawText)
       } catch (e) {
-        console.log('[API] upload response is not JSON')
+        // ignore parse error
       }
-      console.error('[API] UPLOAD ERROR →', error)
       throw new Error(error.message || 'Erro no upload das fotos')
     }
 

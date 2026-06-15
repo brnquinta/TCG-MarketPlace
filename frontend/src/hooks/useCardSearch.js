@@ -6,7 +6,6 @@ import {
   getSets,
 } from '../services/pokemonTcg'
 
-// CACHE GLOBAL
 let cachedSets = null
 let cachedRarities = null
 let cachedUsd = null
@@ -36,8 +35,6 @@ function useCardSearch() {
   useEffect(() => {
     const fetchInitialData = async () => {
       if (cachedUsd && cachedRarities && cachedSets) {
-        console.log('USANDO CACHE')
-
         setUsdToBrl(cachedUsd)
         setRarities(cachedRarities)
         setSets(cachedSets)
@@ -48,8 +45,6 @@ function useCardSearch() {
       setLoadingOptions(true)
 
       try {
-        console.log('BUSCANDO DADOS LOCAIS')
-
         const [cotacao, raritiesData, setsData] = await Promise.all([
           getUsdToBrl().catch(() => 5.8),
           getRarities(),

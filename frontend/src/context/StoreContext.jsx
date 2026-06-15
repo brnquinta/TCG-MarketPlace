@@ -11,8 +11,6 @@ export function StoreProvider({ children }) {
 
   const [store, setStore] = useState(null)
   const [loading, setLoading] = useState(true)
-
-  // ⭐ ADICIONADO: listings local state
   const [listings, setListings] = useState([])
 
   const [listingFilters, setListingFilters] = useState({
@@ -64,7 +62,6 @@ export function StoreProvider({ children }) {
     fetchStore()
   }, [user, isLoaded])
 
-  // ================= STORE =================
   const updateStore = async (updates) => {
     const previousStore = store
 
@@ -98,7 +95,6 @@ export function StoreProvider({ children }) {
     }
   }
 
-  // ================= LISTINGS (NOVO) =================
   const addListing = (listing) => {
     setListings((prev) => [listing, ...prev])
   }
@@ -135,7 +131,6 @@ export function StoreProvider({ children }) {
         hasListings: listings.length > 0,
         isLoading: loading,
 
-        // ⭐ ADICIONADO AQUI
         listings,
         addListing,
         removeListing,

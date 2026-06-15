@@ -16,7 +16,6 @@ export function useApiStore() {
   const [isSyncing, setIsSyncing] = useState(false)
   const [error, setError] = useState(null)
 
-  /* ================= AUTH SYNC ================= */
   const syncUserToBackend = useCallback(async () => {
     if (!user || !isLoaded) return
 
@@ -39,7 +38,6 @@ export function useApiStore() {
     }
   }, [user, isLoaded])
 
-  /* ================= STORE ================= */
   const fetchStoreFromBackend = useCallback(async () => {
     if (!user) return null
 
@@ -85,7 +83,6 @@ export function useApiStore() {
     }
   }, [updateLocalStore])
 
-  /* ================= LISTINGS ================= */
   const fetchListingsFromBackend = useCallback(async () => {
     if (!user) return []
 
@@ -102,11 +99,7 @@ const createListingOnBackend = useCallback(async (listingData) => {
   try {
     const response = await listingAPI.create(listingData)
 
-    console.log("🔥 BACKEND RESPONSE FULL:", response)
-
-    const listing = response // 👈 AQUI É O FIX
-
-    console.log("🔥 LISTING FINAL:", listing)
+    const listing = response
 
     if (addLocalListing) {
       addLocalListing(listing)

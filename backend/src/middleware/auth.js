@@ -13,7 +13,6 @@ const buildUser = async (payload) => {
       lastName: payload.last_name || ''
     })
     await user.save()
-    console.log(`Usuario criado automaticamente: ${clerkId}`)
   }
 
   return {

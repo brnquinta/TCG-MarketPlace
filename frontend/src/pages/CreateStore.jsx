@@ -107,9 +107,6 @@ function CreateStore() {
 
       const createdStore = await response.json()
 
-      console.log(createdStore)
-
-      // atualiza o contexto antes do navigate
       await fetchStore()
 
       navigate('/dashboard')
